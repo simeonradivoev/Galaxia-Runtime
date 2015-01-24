@@ -27,7 +27,7 @@ namespace Galaxia
             particle.color = p.color;
             particle.position = p.position;
             particle.lifetime = Mathf.Infinity;
-            particle.startLifetime = Mathf.Infinity;
+            //particle.startLifetime = Mathf.Infinity;
             particle.size = p.size;
             return particle;
         }
