@@ -98,6 +98,11 @@ namespace Galaxia
                 }
 
                 particles.Clear();
+
+                foreach(Transform t in transform)
+                {
+                    DestroyImmediate(t.gameObject,true);
+                }
             }else
             {
                 particles = new List<Particles>();

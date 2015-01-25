@@ -40,12 +40,14 @@ namespace Galaxia
         {
             if (m_prefab != null && m_prefab.active)
             {
-                if (directx11)
+                //only do geometry shader particles on direct x 10 and above
+                if (directx11 && SystemInfo.graphicsShaderLevel >= 40)
                 {
                     if (m_meshes != null)
                     {
                         DestroyRenderers();
                         m_renderers = new GameObject[m_meshes.Length];
+                        m_prefab.RecreateMaterial(galaxy);
 
                         for (int i = 0; i < m_meshes.Length; i++)
                         {
@@ -63,19 +65,20 @@ namespace Galaxia
                             m_renderers[i] = g;
                         }
 
-                        m_prefab.RecreateMaterial(galaxy);
+                        
                     }
                 }
                 else
                 {
                     GameObject g = new GameObject("Shuriken Renderer",typeof(ParticleSystem));
+                    g.transform.parent = transform;
                     ParticleSystem system = g.GetComponent<ParticleSystem>();
-                    system.maxParticles = Prefab.Count;
+                    system.maxParticles = m_prefab.Count;
                     system.playOnAwake = false;
-                    system.renderer.bounds.Expand(Vector3.one * Prefab.GalaxyPrefab.Size * 2);
-                    //system.Stop();
-                    //system.Simulate(1);
-                    system.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), ParticleList.Length);
+                    system.renderer.material = Resources.Load<Material>("Materials/ParticleSystemParticle");
+                    system.renderer.material.mainTexture = m_prefab.Texture;
+                    system.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
+                    system.Stop();
                 }
                 
             }
