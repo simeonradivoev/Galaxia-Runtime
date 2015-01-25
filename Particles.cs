@@ -26,17 +26,50 @@ namespace Galaxia
         [SerializeField]
         [HideInInspector]
         private Mesh[] m_meshes;
+        [SerializeField]
+        [HideInInspector]
+        private GalaxyPrefab m_galaxyPrefab;
+        private bool m_needsRebuild = true;
+        private bool m_needsUpdate = true;
         #endregion
 
+        /// <summary>
+        /// Generate the particle data as well as the mesh
+        /// </summary>
+        /// <param name="Prefab">The Particle prefab to use</param>
+        /// <param name="galaxy">The galaxy prefab</param>
         public void Generate(ParticlesPrefab Prefab, GalaxyPrefab galaxy)
         {
-            Debug.Log("Particle Generation Started");
             this.m_prefab = Prefab;
-            CreateParticleList(galaxy);
-            CreateMeshes(galaxy);
+            this.m_galaxyPrefab = galaxy;
+            UpdateParticleList();
+            UpdateMeshes();
         }
 
-        public void Build(GalaxyPrefab galaxy,bool directx11)
+        void Update()
+        {
+            if(m_needsRebuild)
+            {
+                if (m_prefab != null && m_galaxyPrefab != null)
+                {
+                    Build(true);
+                }
+            }
+
+            if(m_needsUpdate)
+            {
+                UpdateParticles();
+            }
+        }
+
+
+        /// <summary>
+        /// Rebuilds the renderers with the generated mesh
+        /// if the system doesn not support geometry shaders it will build it with unity's particle system
+        /// </summary>
+        /// <param name="galaxy">The galaxy prefab</param>
+        /// <param name="directx11">if you want to render in directx 11 or not</param>
+        internal void Build(bool directx11)
         {
             if (m_prefab != null && m_prefab.active)
             {
@@ -47,7 +80,7 @@ namespace Galaxia
                     {
                         DestroyRenderers();
                         m_renderers = new GameObject[m_meshes.Length];
-                        m_prefab.UpdateMaterial(galaxy);
+                        m_prefab.UpdateMaterial(m_galaxyPrefab);
 
                         for (int i = 0; i < m_meshes.Length; i++)
                         {
@@ -80,23 +113,26 @@ namespace Galaxia
                     system.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
                     system.Stop();
                 }
-                
+
+                m_needsRebuild = false;
             }
         }
 
-        public void UpdateParticles(GalaxyPrefab galaxy)
+        internal void UpdateParticles()
         {
             if (m_prefab != null)
             {
                 if (m_meshes != null && m_meshes.Length == MeshCount(m_prefab.Count))
                 {
-                    UpdateParticleList(galaxy);
-                    UpdateMeshes(galaxy);
+                    UpdateParticleList();
+                    UpdateMeshes();
                 }
                 else
                 {
-                    Generate(m_prefab, galaxy);
+                    Generate(m_prefab, m_galaxyPrefab);
                 }
+
+                m_needsUpdate = false;
             }
             else
             {
@@ -104,14 +140,14 @@ namespace Galaxia
             }
         }
 
-        public void UpdateParticles_MT(object galaxyObj)
+        internal void UpdateParticles_MT(object galaxyObj)
         {
             GalaxyPrefab galaxy = galaxyObj as GalaxyPrefab;
 
             if (m_meshes != null && m_meshes.Length == MeshCount(m_prefab.Count))
             {
-                UpdateParticleList(galaxy);
-                UpdateMeshes(galaxy);
+                UpdateParticleList();
+                UpdateMeshes();
             }
             else
             {
@@ -119,7 +155,7 @@ namespace Galaxia
             }
         }
 
-        public void DrawNow(GalaxyPrefab galaxy)
+        public void DrawNow()
         {
             foreach(Mesh m in m_meshes)
             {
@@ -127,7 +163,7 @@ namespace Galaxia
                 {
                     if (m_prefab.Material.SetPass(0))
                     {
-                        m_prefab.UpdateMaterial(galaxy);
+                        m_prefab.UpdateMaterial(m_galaxyPrefab);
                         Graphics.DrawMeshNow(m, transform.parent.localToWorldMatrix);
                     }
                 }
@@ -150,15 +186,22 @@ namespace Galaxia
             return Mathf.FloorToInt((float)Count / (float)MAX_VERTEX_PER_MESH) + 1;
         }
 
-        public void CreateMeshes(GalaxyPrefab galaxy)
+        /// <summary>
+        /// Updates the generated meshes with the information from the particle data list
+        /// </summary>
+        /// <param name="galaxy">The galaxy prefab</param>
+        void UpdateMeshes()
         {
-            DestoryMeshes();
-            m_meshes = new Mesh[MeshCount(m_prefab.Count)];
-            UpdateMeshes(galaxy);
-        }
+            if (m_meshes == null)
+            {
+                m_meshes = new Mesh[0];
+            }
 
-        void UpdateMeshes(GalaxyPrefab galaxy)
-        {
+            if (m_meshes.Length != MeshCount(m_prefab.Count))
+            {
+                System.Array.Resize<Mesh>(ref m_meshes, MeshCount(m_prefab.Count));
+            }
+
             Random.seed = m_prefab.Seed;
 
             for (int i = 0; i < m_meshes.Length; i++)
@@ -170,6 +213,7 @@ namespace Galaxia
                 if (m_meshes[i] == null)
                 {
                     m_meshes[i] = new Mesh();
+                    m_meshes[i].hideFlags = HideFlags.HideAndDontSave;
                 }
                 else if (m_meshes[i].vertexCount > size)
                 {
@@ -245,15 +289,19 @@ namespace Galaxia
             }
         }
 
-        public void CreateParticleList(GalaxyPrefab galaxy)
+        /// <summary>
+        /// Update the particle data list without destroying it
+        /// Resizes the array as needed
+        /// </summary>
+        /// <param name="galaxy">The galaxy prefab</param>
+        void UpdateParticleList()
         {
-            m_particleList = new Particle[m_prefab.Count];
-            UpdateParticleList(galaxy);
-        }
+            if (m_particleList == null)
+            {
+                m_particleList = new Particle[m_prefab.Count];
+            }
 
-        void UpdateParticleList(GalaxyPrefab galaxy)
-        {
-            if(galaxy.Distributor != null && m_prefab != null)
+            if (m_galaxyPrefab.Distributor != null && m_prefab != null)
             {
                 if (m_particleList.Length != m_prefab.Count)
                 {
@@ -265,12 +313,12 @@ namespace Galaxia
                 for (int i = 0; i < m_prefab.Count; i++)
                 {
                     m_particleList[i] = new Particle();
-                    galaxy.Distributor.Process(m_particleList[i], galaxy, m_prefab, 0, i);
+                    m_galaxyPrefab.Distributor.Process(m_particleList[i], m_galaxyPrefab, m_prefab, 0, i);
                 }
             }
             else
             {
-                if(galaxy.Distributor == null)
+                if (m_galaxyPrefab.Distributor == null)
                     Debug.LogWarning("No Particle Distributor");
                 if (m_prefab == null)
                     Debug.LogWarning("No Particle Distributor");
@@ -288,7 +336,7 @@ namespace Galaxia
             GameObject.DestroyImmediate(gameObject);
         }
 
-        public void DestroyRenderers()
+        void DestroyRenderers()
         {
             if (m_renderers != null)
             {
@@ -305,7 +353,7 @@ namespace Galaxia
             }
         }
 
-        public void DestoryMeshes()
+        void DestoryMeshes()
         {
             if (m_meshes != null)
             {
@@ -323,6 +371,9 @@ namespace Galaxia
         public Particle[] ParticleList { get { return m_particleList; } }
         public GameObject[] Renderers { get { return m_renderers; } }
         public Mesh[] Meshes { get { return m_meshes; } }
+        public bool NeedsRebuild { get { return m_needsRebuild; } set { m_needsRebuild = value; } }
+        public bool NeedsUpdate { get { return m_needsUpdate; } set { m_needsUpdate = value; } }
+        public GalaxyPrefab GalaxyPrefab { get { return m_galaxyPrefab; } set { m_galaxyPrefab = value; } }
         #endregion
     }
 }

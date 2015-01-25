@@ -116,6 +116,9 @@ namespace Galaxia
             if(index >= 0)
             {
                 m_particlePrefabs.Insert(index + 1, toInsert);
+            #if HIDE_SUB_ASSETS
+            toInsert.hideFlags = HideFlags.HideInHierarchy;
+            #endif
             }
         }
 

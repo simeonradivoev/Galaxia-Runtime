@@ -34,11 +34,6 @@ namespace Galaxia
                     GenerateParticles();
                 else
                     UpdateParticles();
-
-                foreach(Particles p in particles)
-                {
-                    p.Build(GalaxyPrefab,m_directx11);
-                }
             }
         }
         #endregion
@@ -69,14 +64,6 @@ namespace Galaxia
                         particles.Add(p);
                     }
                 }
-
-                //if(Application.isPlaying)
-                //{
-                //    foreach(Particles p in particles)
-                //    {
-                //        p.Build(m_galaxy, directx11);
-                //    }
-                //}
             }
         }
         /// <summary>
@@ -124,13 +111,26 @@ namespace Galaxia
             {
                 if(GalaxyPrefab != null)
                 {
-                    particle.UpdateParticles(m_galaxy);
-
-                    //if(Application.isPlaying)
-                    //{
-                    //    particle.Build(m_galaxy);
-                    //}
+                    //particle.UpdateParticles();
+                    particle.NeedsUpdate = true;
                 } 
+            }
+        }
+        void ForceUpdateParticles()
+        {
+            Debug.Log("Updating particles");
+
+            if (GalaxyPrefab != null)
+            {
+                GalaxyPrefab.Distributor.RecreateCurves();
+            }
+
+            foreach (Particles particle in particles)
+            {
+                if (GalaxyPrefab != null)
+                {
+                    particle.UpdateParticles();
+                }
             }
         }
         /// <summary>
@@ -158,11 +158,17 @@ namespace Galaxia
             {
                 if (m_galaxy != null && particle.Prefab == prefab)
                 {
-                    particle.UpdateParticles(GalaxyPrefab);
-                    //if(Application.isPlaying)
-                    //{
-                    //    particle.Build(m_galaxy);
-                    //}
+                    particle.NeedsUpdate = true;
+                }
+            }
+        }
+        void ForceUpdateParticles(ParticlesPrefab prefab)
+        {
+            foreach (Particles particle in particles)
+            {
+                if (m_galaxy != null && particle.Prefab == prefab)
+                {
+                    particle.UpdateParticles();
                 }
             }
         }
@@ -199,7 +205,7 @@ namespace Galaxia
                         particle.Prefab.UpdateMaterialAnimation(GalaxyPrefab, AnimationSpeed, Animate);
 
                         if (particle != null && particle.Prefab != null)
-                            particle.DrawNow(GalaxyPrefab);
+                            particle.DrawNow();
                     }
                 }
             }
