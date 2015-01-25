@@ -47,7 +47,7 @@ namespace Galaxia
                     {
                         DestroyRenderers();
                         m_renderers = new GameObject[m_meshes.Length];
-                        m_prefab.RecreateMaterial(galaxy);
+                        m_prefab.UpdateMaterial(galaxy);
 
                         for (int i = 0; i < m_meshes.Length; i++)
                         {

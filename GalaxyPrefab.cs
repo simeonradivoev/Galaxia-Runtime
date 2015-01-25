@@ -1,4 +1,5 @@
-﻿#define HIDE_SUB_ASSETS
+﻿//#define HIDE_SUB_ASSETS
+//#define CAN_EDIT_RESOURCES
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -95,14 +96,16 @@ namespace Galaxia
         public ParticlesPrefab Create(string name,ParticlesPrefab.Preset Preset)
         {
             ParticlesPrefab prefab = CreateInstance<ParticlesPrefab>();
+            
+            prefab.name = name;
+            //prefab.Material = new Material(shader);
+            //prefab.Material.name = name + "_material";
+            //prefab.Material.hideFlags = HideFlags.None;
+            PopulatePreset(prefab, Preset);
+            Add(prefab);
             #if HIDE_SUB_ASSETS
             prefab.hideFlags = HideFlags.HideInHierarchy;
             #endif
-            prefab.name = name;
-            prefab.Material = new Material(shader);
-            prefab.Material.hideFlags = HideFlags.HideInHierarchy | HideFlags.NotEditable;
-            PopulatePreset(prefab, Preset);
-            Add(prefab);
             return prefab;
         }
 

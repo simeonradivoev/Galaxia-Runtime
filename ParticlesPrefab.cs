@@ -140,16 +140,14 @@ namespace Galaxia
             return size;
         }
 
-        public void RecreateMaterial(GalaxyPrefab prefab)
-        {
-            if (m_material == null)
-                m_material = new Material(prefab.shader);
-
-            UpdateMaterial(prefab);
-        }
-
         public void UpdateMaterial(GalaxyPrefab prefab)
         {
+            if (m_material == null)
+            {
+                m_material = new Material(prefab.shader);
+                m_material.hideFlags = HideFlags.DontSave;
+            }
+
             if (prefab != null && m_material != null)
             {
                 m_material.mainTexture = Texture;
