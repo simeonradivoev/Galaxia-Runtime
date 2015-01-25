@@ -29,6 +29,7 @@ namespace Galaxia
         [SerializeField]
         [HideInInspector]
         private GalaxyPrefab m_galaxyPrefab;
+        private bool m_gpu = true;
         private bool m_needsRebuild = true;
         private bool m_needsUpdate = true;
         #endregion
@@ -38,21 +39,22 @@ namespace Galaxia
         /// </summary>
         /// <param name="Prefab">The Particle prefab to use</param>
         /// <param name="galaxy">The galaxy prefab</param>
-        public void Generate(ParticlesPrefab Prefab, GalaxyPrefab galaxy)
+        public void Generate(ParticlesPrefab Prefab, GalaxyPrefab galaxy,bool gpu)
         {
             this.m_prefab = Prefab;
             this.m_galaxyPrefab = galaxy;
+            this.m_gpu = gpu;
             UpdateParticleList();
             UpdateMeshes();
         }
 
-        void Update()
+        void LateUpdate()
         {
             if(m_needsRebuild)
             {
                 if (m_prefab != null && m_galaxyPrefab != null)
                 {
-                    Build(true);
+                    Build(m_gpu);
                 }
             }
 
@@ -129,7 +131,7 @@ namespace Galaxia
                 }
                 else
                 {
-                    Generate(m_prefab, m_galaxyPrefab);
+                    Generate(m_prefab, m_galaxyPrefab,m_gpu);
                 }
 
                 m_needsUpdate = false;
@@ -246,49 +248,6 @@ namespace Galaxia
             }
         }
 
-        void UpdateMeshes_MT()
-        {
-            for (int i = 0; i < m_meshes.Length; i++)
-            {
-                int size = MAX_VERTEX_PER_MESH;
-                if (i == m_meshes.Length - 1)
-                    size = m_prefab.Count - MAX_VERTEX_PER_MESH * i;
-
-                if (m_meshes[i] == null)
-                {
-                    m_meshes[i] = new Mesh();
-                }
-                else if (m_meshes[i].vertexCount > size)
-                {
-                    m_meshes[i].Clear(true);
-                }
-
-                Vector3[] vertex = new Vector3[size];
-                Color[] color = new Color[size];
-                Vector2[] info = new Vector2[size];
-                Vector2[] indexStartTime = new Vector2[size];
-                int[] indexes = new int[size];
-
-                for (int e = 0; e < size; e++)
-                {
-                    vertex[e] = m_particleList[i * MAX_VERTEX_PER_MESH + e].position;
-                    color[e] = m_particleList[i * MAX_VERTEX_PER_MESH + e].color;
-                    info[e].x = m_particleList[i * MAX_VERTEX_PER_MESH + e].size;
-                    info[e].y = Random.Next(-1.0f, 1.0f);
-                    indexStartTime[e].x = (i * MAX_VERTEX_PER_MESH + e);
-                    indexStartTime[e].y = Random.Next(0, Mathf.PI * 2f);
-                    indexes[e] = e;
-                }
-
-                m_meshes[i].vertices = vertex;
-                m_meshes[i].colors = color;
-                m_meshes[i].uv = info;
-                m_meshes[i].uv1 = indexStartTime;
-                m_meshes[i].SetIndices(indexes, MeshTopology.Points, 0);
-                m_meshes[i].RecalculateBounds();
-            }
-        }
-
         /// <summary>
         /// Update the particle data list without destroying it
         /// Resizes the array as needed
@@ -309,11 +268,10 @@ namespace Galaxia
                 }
 
                 Random.seed = (int)(m_prefab.Seed);
-
                 for (int i = 0; i < m_prefab.Count; i++)
                 {
                     m_particleList[i] = new Particle();
-                    m_galaxyPrefab.Distributor.Process(m_particleList[i], m_galaxyPrefab, m_prefab, 0, i);
+                    m_galaxyPrefab.Distributor.Process(new ParticleDistributor.ProcessContext(m_particleList[i], m_galaxyPrefab, m_prefab, 0, i));
                 }
             }
             else
@@ -322,7 +280,6 @@ namespace Galaxia
                     Debug.LogWarning("No Particle Distributor");
                 if (m_prefab == null)
                     Debug.LogWarning("No Particle Distributor");
-                
             }
                 
         }

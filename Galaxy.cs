@@ -60,7 +60,7 @@ namespace Galaxia
                         obj.hideFlags |= HideFlags.NotEditable;
                         obj.transform.parent = transform;
                         Particles p = obj.GetComponent<Particles>();
-                        p.Generate(prefab, GalaxyPrefab);
+                        p.Generate(prefab, GalaxyPrefab,m_directx11);
                         particles.Add(p);
                     }
                 }

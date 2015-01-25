@@ -37,15 +37,15 @@ namespace Galaxia
         /// <param name="center">The local center of the galaxy. It is adviced to use the transform of the galaxy to move it</param>
         /// <param name="angleRotation">the global rotation for all the particles a.k.a. the time</param>
         /// <param name="index">the index of the particle</param>
-        public override void Process(Particle particle, GalaxyPrefab galaxy, ParticlesPrefab particles, float time, float index)
+        public override void Process(ProcessContext context)
         {
-            float dis = particles.PositionDistribution.Evaluate(index / (float)particles.Count);
-            particle.index = (float)particles.Count * dis;
-            float starIndexMultiplyer = 1f / (float)particles.Count;
+            float dis = context.particles.PositionDistribution.Evaluate(context.index / (float)context.particles.Count);
+            context.particle.index = (float)context.particles.Count * dis;
+            float starIndexMultiplyer = 1f / (float)context.particles.Count;
 
-            float a = periapsisDistance + starIndexMultiplyer * particle.index;			//Apsis
+            float a = periapsisDistance + starIndexMultiplyer * context.particle.index;			//Apsis
             float a2 = Mathf.Pow(a, 2);							//the Apsis * Apsis
-            float b = apsisDistance + starIndexMultiplyer * particle.index;			//Periphrasis
+            float b = apsisDistance + starIndexMultiplyer * context.particle.index;			//Periphrasis
             float b2 = Mathf.Pow(b, 2);							//the Periphrasis * Periphrasis
             float e = Mathf.Sqrt(1 - Mathf.Min(b2, a2) / Mathf.Max(b2, a2));							//eccentricity of the ellipse
             float GP = G * (CenterMass + StarMass);
@@ -53,14 +53,14 @@ namespace Galaxia
             float T = (Mathf.PI * 2) * Mathf.Sqrt(Mathf.Pow(a, 3) / GP);	//orbital period
 
             //_focalPoint = Random.Range(galaxy.FocalPoint, -galaxy.FocalPoint);		//the foci's center of the ellipse
-            particle.focalPoint = Random.Next(FocalPoint, -FocalPoint);
-            float _centerX = (a * e) * particle.focalPoint;							//set the center to be the foci's point
+            context.particle.focalPoint = Random.Next(FocalPoint, -FocalPoint);
+            float _centerX = (a * e) * context.particle.focalPoint;							//set the center to be the foci's point
             float _centerZ = 0;
 
-            float angle = (angleOffset / (float)particles.Count) * particle.index;
+            float angle = (angleOffset / (float)context.particles.Count) * context.particle.index;
 
-            particle.startingTime = Random.Next(0f, (2f * Mathf.PI));
-            float _angleRotation = time + particle.startingTime;
+            context.particle.startingTime = Random.Next(0f, (2f * Mathf.PI));
+            float _angleRotation = context.time + context.particle.startingTime;
 
             float CosB = Mathf.Cos(angle);								//the Cos of the rotation angle of the ellipse
             float SinB = Mathf.Sin(angle);								//the Sin of the rotation angle of the ellipse
@@ -68,17 +68,17 @@ namespace Galaxia
             float x = (a * Mathf.Cos(_angleRotation / T)) + _centerX;
             float z = (b * Mathf.Sin(_angleRotation / T)) + _centerZ;
 
-            Vector3 _pos = new Vector3(((x * CosB) + (z * SinB)) * galaxy.Size, 0, ((x * SinB) - (z * CosB)) * galaxy.Size);
+            Vector3 _pos = new Vector3(((x * CosB) + (z * SinB)) * context.galaxy.Size, 0, ((x * SinB) - (z * CosB)) * context.galaxy.Size);
 
 
-            float height = (Mathf.Clamp01(GalaxyHeightIntegralInverse.Evaluate(Random.Next())) * (galaxy.HeightOffset + galaxy.HeightOffset)) - galaxy.HeightOffset;
-            height *= GalaxyHeightMultiply.Evaluate(index / (float)particles.Count);
+            float height = (Mathf.Clamp01(GalaxyHeightIntegralInverse.Evaluate(Random.Next())) * (context.galaxy.HeightOffset + context.galaxy.HeightOffset)) - context.galaxy.HeightOffset;
+            height *= GalaxyHeightMultiply.Evaluate(context.index / (float)context.particles.Count);
             _pos.y = height;
 
-            particle.color = particles.GetColor(_pos.magnitude, galaxy.Size, _angleRotation / T, particle.index);
-            particle.size = particles.GetSize(_pos.magnitude, galaxy.Size, _angleRotation / T, particle.index);
+            context.particle.color = context.particles.GetColor(_pos.magnitude, context.galaxy.Size, _angleRotation / T, context.particle.index);
+            context.particle.size = context.particles.GetSize(_pos.magnitude, context.galaxy.Size, _angleRotation / T, context.particle.index);
 
-            particle.position = _pos;
+            context.particle.position = _pos;
         }
 
         public override void RecreateCurves()

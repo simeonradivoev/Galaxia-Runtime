@@ -17,7 +17,7 @@ namespace Galaxia
         private AnimationCurve m_galaxyHeightMultiply = DefaultResources.HeightCurve;
         #endregion
         #region Abstract methods
-        public abstract void Process(Particle particle, GalaxyPrefab galaxy, ParticlesPrefab particles, float time, float index);
+        public abstract void Process(ProcessContext context);
         public abstract void UpdateMaterial(Material material);
         #endregion
         #region Virtual Methods
@@ -57,6 +57,24 @@ namespace Galaxia
 
             Debug.Log(normalizer);
             return integral;
+        }
+
+        public struct ProcessContext
+        {
+            public Particle particle;
+            public GalaxyPrefab galaxy;
+            public ParticlesPrefab particles;
+            public float time;
+            public float index;
+
+            public ProcessContext(Particle particle, GalaxyPrefab galaxy, ParticlesPrefab particles, float time, float index)
+            {
+                this.particle = particle;
+                this.galaxy = galaxy;
+                this.particles = particles;
+                this.time = time;
+                this.index = index;
+            }
         }
 
         public static AnimationCurve Inverse(AnimationCurve curve)
