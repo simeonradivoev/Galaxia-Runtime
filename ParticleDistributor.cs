@@ -9,16 +9,13 @@ namespace Galaxia
         public const float G = 6.67384f;
         #endregion
         #region Private
-        [SerializeField]
-        [CurveRange(0, 0, 1, 1)]
-        private AnimationCurve m_galaxyHeightDistribution = DefaultResources.HeightCurve;
-        [SerializeField]
-        [CurveRange(0, 0, 1, 1)]
-        private AnimationCurve m_galaxyHeightMultiply = DefaultResources.HeightCurve;
         #endregion
         #region Abstract methods
         public abstract void Process(ProcessContext context);
-        public abstract void UpdateMaterial(Material material);
+        public virtual void UpdateMaterial(Material material)
+        {
+
+        }
         #endregion
         #region Virtual Methods
         public virtual void RecreateCurves() { }
@@ -87,10 +84,6 @@ namespace Galaxia
             }
             return inverse;
         }
-        #endregion
-        #region Getters and setters
-        public AnimationCurve GalaxyHeightDistribution { get { return m_galaxyHeightDistribution; } set { m_galaxyHeightDistribution = value; RecreateCurves(); } }
-        public AnimationCurve GalaxyHeightMultiply { get { return m_galaxyHeightMultiply; } set { m_galaxyHeightMultiply = value; RecreateCurves(); } }
         #endregion
     }
 }

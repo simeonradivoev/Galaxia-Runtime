@@ -19,6 +19,12 @@ namespace Galaxia
         [SerializeField]
         private float angleOffset = 8;
         [SerializeField]
+        [CurveRange(0, 0, 1, 1)]
+        private AnimationCurve m_galaxyHeightDistribution = DefaultResources.HeightCurve;
+        [SerializeField]
+        [CurveRange(0, 0, 1, 1)]
+        private AnimationCurve m_galaxyHeightMultiply = DefaultResources.HeightCurve;
+        [SerializeField]
         [HideInInspector]
         private AnimationCurve GalaxyHeightIntegral = Integral(DefaultResources.HeightCurve, 32);
         [SerializeField]
@@ -97,5 +103,10 @@ namespace Galaxia
             material.SetFloat("apsisDistance", apsisDistance);
             material.SetFloat("periapsisDistance", periapsisDistance);
         }
+
+        #region Getters and setters
+        public AnimationCurve GalaxyHeightDistribution { get { return m_galaxyHeightDistribution; } set { m_galaxyHeightDistribution = value; RecreateCurves(); } }
+        public AnimationCurve GalaxyHeightMultiply { get { return m_galaxyHeightMultiply; } set { m_galaxyHeightMultiply = value; RecreateCurves(); } }
+        #endregion
     }
 }

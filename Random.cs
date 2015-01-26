@@ -9,6 +9,7 @@ namespace Galaxia
 {
     public static class Random
     {
+        const double TWO_PI = 6.2831853071795864769252866;
         static FastRandom m_generator;
         static FastRandom Generator { get { if (m_generator == null) m_generator = new FastRandom(); return m_generator; } }
 
@@ -34,20 +35,16 @@ namespace Galaxia
             return Generator.Next(min, max);
         }
 
-        public static double NextGaussianDouble()
+        public static double NextGaussianDouble(double variance)
         {
-            double U, u, v, S;
+	        double rand1, rand2;
 
-            do
-            {
-                u = 2.0 * Generator.NextDouble() - 1.0;
-                v = 2.0 * Generator.NextDouble() - 1.0;
-                S = u * u + v * v;
-            }
-            while (S >= 1.0);
-
-            double fac = Math.Sqrt(-2.0 * Math.Log(S) / S);
-            return u * fac;
+	        rand1 = Generator.NextDouble();
+	        if(rand1 < 1e-100) rand1 = 1e-100;
+	        rand1 = -2 * Math.Log(rand1);
+            rand2 = Generator.NextDouble() * TWO_PI;
+ 
+	        return Math.Sqrt(variance * rand1) * Math.Cos(rand2);
         }
     }
 }

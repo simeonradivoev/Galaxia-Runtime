@@ -52,6 +52,7 @@
     <Compile Include="FastRandom.cs" />
     <Compile Include="Galaxy.cs" />
     <Compile Include="GalaxyPrefab.cs" />
+    <Compile Include="GaussianDistributor.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleDistributor.cs" />
     <Compile Include="Particles.cs" />
