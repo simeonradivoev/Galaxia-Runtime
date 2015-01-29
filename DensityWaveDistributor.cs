@@ -47,21 +47,19 @@ namespace Galaxia
         {
             float dis = context.particles.PositionDistribution.Evaluate(context.index / (float)context.particles.Count);
             context.particle.index = (float)context.particles.Count * dis;
-            float starIndexMultiplyer = 1f / (float)context.particles.Count;
+            float starIndexMultiplyer = (1f / (float)context.particles.Count) * context.particle.index;
 
-            float a = periapsisDistance + starIndexMultiplyer * context.particle.index;			//Apsis
+            float a = periapsisDistance + starIndexMultiplyer;			//Apsis
             float a2 = Mathf.Pow(a, 2);							//the Apsis * Apsis
-            float b = apsisDistance + starIndexMultiplyer * context.particle.index;			//Periphrasis
+            float b = apsisDistance + starIndexMultiplyer;			//Periphrasis
             float b2 = Mathf.Pow(b, 2);							//the Periphrasis * Periphrasis
             float e = Mathf.Sqrt(1 - Mathf.Min(b2, a2) / Mathf.Max(b2, a2));							//eccentricity of the ellipse
             float GP = G * (CenterMass + StarMass);
 
             float T = (Mathf.PI * 2) * Mathf.Sqrt(Mathf.Pow(a, 3) / GP);	//orbital period
 
-            //_focalPoint = Random.Range(galaxy.FocalPoint, -galaxy.FocalPoint);		//the foci's center of the ellipse
             context.particle.focalPoint = Random.Next(FocalPoint, -FocalPoint);
-            float _centerX = (a * e) * context.particle.focalPoint;							//set the center to be the foci's point
-            float _centerZ = 0;
+            float _centerX = (a * e) * context.particle.focalPoint;							//set the center to be the foci's point;
 
             float angle = (angleOffset / (float)context.particles.Count) * context.particle.index;
 
@@ -72,12 +70,12 @@ namespace Galaxia
             float SinB = Mathf.Sin(angle);								//the Sin of the rotation angle of the ellipse
 
             float x = (a * Mathf.Cos(_angleRotation / T)) + _centerX;
-            float z = (b * Mathf.Sin(_angleRotation / T)) + _centerZ;
+            float z = (b * Mathf.Sin(_angleRotation / T));
 
             Vector3 _pos = new Vector3(((x * CosB) + (z * SinB)) * context.galaxy.Size, 0, ((x * SinB) - (z * CosB)) * context.galaxy.Size);
 
 
-            float height = (Mathf.Clamp01(GalaxyHeightIntegralInverse.Evaluate(Random.Next())) * (context.galaxy.HeightOffset + context.galaxy.HeightOffset)) - context.galaxy.HeightOffset;
+            float height = (Mathf.Clamp01(GalaxyHeightIntegralInverse.Evaluate(Random.Next())) * (context.galaxy.HeightOffset * 2)) - context.galaxy.HeightOffset;
             height *= GalaxyHeightMultiply.Evaluate(context.index / (float)context.particles.Count);
             _pos.y = height;
 

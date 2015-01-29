@@ -62,6 +62,7 @@ namespace Galaxia
                         Particles p = obj.GetComponent<Particles>();
                         p.Generate(prefab, GalaxyPrefab,m_directx11);
                         particles.Add(p);
+                        prefab.UpdateMaterial(GalaxyPrefab);
                     }
                 }
             }

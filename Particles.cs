@@ -245,6 +245,8 @@ namespace Galaxia
                 m_meshes[i].uv1 = indexStartTime;
                 m_meshes[i].SetIndices(indexes, MeshTopology.Points, 0);
                 m_meshes[i].RecalculateBounds();
+
+
             }
         }
 
