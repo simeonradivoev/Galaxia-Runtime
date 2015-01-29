@@ -15,7 +15,7 @@ namespace Galaxia
         [HideInInspector]
         private List<Particles> particles;
         [SerializeField]
-        private GenerationTime m_generationType;
+        private GalaxyGenerationType m_generationType;
         [SerializeField]
         private float m_animationSpeed = 0.001f;
         [SerializeField]
@@ -30,10 +30,7 @@ namespace Galaxia
         {
             if (GalaxyPrefab != null)
             {
-                if (GenerationType == GenerationTime.Runtime)
-                    GenerateParticles();
-                else
-                    UpdateParticles();
+                GenerateParticles();
             }
         }
         #endregion
@@ -230,17 +227,28 @@ namespace Galaxia
         #region Getters And Setters
         public Vector3 Position { get { return transform.position; } set { transform.position = value; } }
         public List<Particles> Particles { get { return particles; } }
-        public GenerationTime GenerationType { get { return m_generationType; } set { m_generationType = value; } }
+        public GalaxyGenerationType GenerationType { get { return m_generationType; } set { m_generationType = value; } }
         public float AnimationSpeed { get { return m_animationSpeed; } set { m_animationSpeed = value; } }
         public bool Animate { get { return m_animate; } set { m_animate = value; } }
-        public GalaxyPrefab GalaxyPrefab { get { return m_galaxy; } set { m_galaxy = value; } }
+        public GalaxyPrefab GalaxyPrefab
+        {
+            get { return m_galaxy; }
+            set
+            {
+                m_galaxy = value;
+                if(m_generationType == GalaxyGenerationType.Automatic)
+                {
+                    GenerateParticles();
+                }
+            }
+        }
         public bool DirectX11 { get { return m_directx11; } set { m_directx11 = value; } }
         #endregion
         #region enums
-        public enum GenerationTime
+        public enum GalaxyGenerationType
         {
-            Runtime,
-            Editor
+            Automatic,
+            Manual
         }
         #endregion
 

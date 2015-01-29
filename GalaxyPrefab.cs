@@ -152,6 +152,42 @@ namespace Galaxia
             return m_particlePrefabs.Remove(item);
         }
 
+        public void UpdateAllGalaxies()
+        {
+            foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
+            {
+                if (galaxy.GalaxyPrefab == this)
+                {
+                    galaxy.UpdateParticles();
+                }
+            }
+        }
+
+        public void UpdateAllGalaxies(ParticlesPrefab prefab)
+        {
+            foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
+            {
+                if (galaxy.GalaxyPrefab == this)
+                {
+                    galaxy.UpdateParticles(prefab);
+                }
+            }
+        }
+
+        public void RecreateAllGalaxies()
+        {
+            if (UnityEditorInternal.InternalEditorUtility.HasPro())
+            {
+                foreach (Galaxy g in GameObject.FindObjectsOfType<Galaxy>())
+                {
+                    if (g.GalaxyPrefab == this)
+                    {
+                        g.GenerateParticles();
+                    }
+                }
+            }
+        }
+
         #region Setters and Getters
         public float Size { get { return m_size; } set { m_size = value; } }
         public float HeightOffset { get { return m_heightOffset; } set { m_heightOffset = value; } }

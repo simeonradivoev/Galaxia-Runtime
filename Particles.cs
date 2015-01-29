@@ -126,6 +126,7 @@ namespace Galaxia
             {
                 if (m_meshes != null && m_meshes.Length == MeshCount(m_prefab.Count))
                 {
+                    UpdateRenderer();
                     UpdateParticleList();
                     UpdateMeshes();
                 }
@@ -247,6 +248,19 @@ namespace Galaxia
                 m_meshes[i].RecalculateBounds();
 
 
+            }
+        }
+        /// <summary>
+        /// Update all parameters of the renderer
+        /// </summary>
+        void UpdateRenderer()
+        {
+            if (Renderers != null && Prefab != null)
+            {
+                foreach (GameObject g in Renderers)
+                {
+                    g.renderer.enabled = Prefab.active;
+                }
             }
         }
 
