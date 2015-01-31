@@ -49,6 +49,8 @@
     <Compile Include="CurveRange.cs" />
     <Compile Include="DefaultResources.cs" />
     <Compile Include="DensityWaveDistributor.cs" />
+    <Compile Include="DistributionProperty.cs" />
+    <Compile Include="DistributionType.cs" />
     <Compile Include="FastRandom.cs" />
     <Compile Include="Galaxy.cs" />
     <Compile Include="GalaxyPrefab.cs" />

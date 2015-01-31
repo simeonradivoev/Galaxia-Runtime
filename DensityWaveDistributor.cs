@@ -79,8 +79,9 @@ namespace Galaxia
             height *= GalaxyHeightMultiply.Evaluate(context.index / (float)context.particles.Count);
             _pos.y = height;
 
-            context.particle.color = context.particles.GetColor(_pos.magnitude, context.galaxy.Size, _angleRotation / T, context.particle.index);
-            context.particle.size = context.particles.GetSize(_pos.magnitude, context.galaxy.Size, _angleRotation / T, context.particle.index);
+            context.particle.color = context.particles.GetColor(_pos,_pos.magnitude, context.galaxy.Size, _angleRotation / T, context.particle.index);
+            context.particle.size = context.particles.GetSize(_pos,_pos.magnitude, context.galaxy.Size, _angleRotation / T, context.particle.index);
+            context.particle.rotation = context.particles.GetRotation();
 
             context.particle.position = _pos;
         }

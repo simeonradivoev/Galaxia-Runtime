@@ -23,18 +23,20 @@ namespace Galaxia
         [CurveRange(0, 0, 1, 1)]
         [SerializeField]
         private AnimationCurve m_positionDistribution = AnimationCurve.Linear(0,0,1,1);
+
         [Header("Size")]
         [SerializeField]
-        private Distribution m_sizeDistributionType;
+        private DistrbuitionType m_sizeDistributionType;
         [CurveRange(0, 0, 1, 1)]
         [SerializeField]
         private AnimationCurve m_sizeDistribution = AnimationCurve.Linear(0, 1, 1, 1);
         [Range(0, 1)]
         [SerializeField]
         private float m_sizeVariation = 0;
+
         [Header("Alpha")]
         [SerializeField]
-        private Distribution m_alphaDistributionType;
+        private DistrbuitionType m_alphaDistributionType;
         [CurveRange(0, 0, 1, 1)]
         [SerializeField]
         private AnimationCurve m_alpha = DefaultResources.AlphaCurve;
@@ -44,9 +46,10 @@ namespace Galaxia
         [Range(0, 1)]
         [SerializeField]
         private float m_alphaMultiplayer = 1;
+
         [Header("Color")]
         [SerializeField]
-        private Distribution m_colorDistributionType;
+        private DistrbuitionType m_colorDistributionType;
         [SerializeField]
         private Gradient m_color = DefaultResources.StarColorGradient;
         [Range(0, 1)]
@@ -54,6 +57,14 @@ namespace Galaxia
         private float m_colorVariation = 0;
         [SerializeField]
         private Texture2D m_texture;
+
+        [Header("Rendering")]
+        [SerializeField]
+        private UnityEngine.Rendering.BlendMode m_blendModeSrc = UnityEngine.Rendering.BlendMode.One;
+        [SerializeField]
+        private UnityEngine.Rendering.BlendMode m_blendModeDis = UnityEngine.Rendering.BlendMode.One;
+        [SerializeField]
+        private int m_renderQueue = 0;
 
         #region hidden
         [SerializeField]
@@ -73,71 +84,82 @@ namespace Galaxia
             m_galaxyPrefab = prefab;
         }
 
-        public Color GetColor(float distance, float GalaxySize, float angle,float index)
+        public Color GetColor(Vector3 pos,float distance, float GalaxySize, float angle,float index)
         {
             float colorPos = 0;
             float alphaPos = 0;
-            float rand = Random.Next();
-            switch (ColorDistributionType)
+            switch (m_colorDistributionType)
             {
-                case ParticlesPrefab.Distribution.Angle:
-                    colorPos = Mathf.Lerp((Mathf.Cos(angle) + 1) / 2f, rand, ColorVariation);
+                case DistrbuitionType.Angle:
+                    colorPos = (Mathf.Cos(angle) + 1) / 2f;
                     break;
-                case ParticlesPrefab.Distribution.Distance:
-                    colorPos = Mathf.Lerp(colorPos, rand, ColorVariation);
+                case DistrbuitionType.Distance:
+                    colorPos = distance / GalaxySize;
                     break;
-                case ParticlesPrefab.Distribution.Linear:
-                    colorPos = Mathf.Lerp((float)index / (float)Count, rand, ColorVariation);
+                case DistrbuitionType.Linear:
+                    colorPos = (float)index / (float)Count;
                     break;
-                case Distribution.Random:
-                    colorPos = rand;
+                case DistrbuitionType.Perlin:
+                    colorPos = Mathf.PerlinNoise(pos.x / GalaxySize, pos.z / GalaxySize);
+                    break;
+                case DistrbuitionType.Random:
+                    colorPos = Random.Next();
                     break;
             }
 
-            rand = Random.Next();
-            switch (AlphaDistributionType)
+            switch (m_alphaDistributionType)
             {
-                case ParticlesPrefab.Distribution.Angle:
-                    alphaPos = Mathf.Lerp((Mathf.Cos(angle) + 1) / 2f, rand, AlphaVariation);
+                case DistrbuitionType.Angle:
+                    alphaPos = (Mathf.Cos(angle) + 1) / 2f;
                     break;
-                case ParticlesPrefab.Distribution.Distance:
-                    alphaPos = Mathf.Lerp(colorPos, rand, AlphaVariation);
+                case DistrbuitionType.Distance:
+                    alphaPos = distance / GalaxySize;
                     break;
-                case ParticlesPrefab.Distribution.Linear:
-                    alphaPos = Mathf.Lerp((float)index / (float)Count, rand, AlphaVariation);
+                case DistrbuitionType.Linear:
+                    alphaPos = (float)index / (float)Count;
                     break;
-                case Distribution.Random:
-                    alphaPos = rand;
+                case DistrbuitionType.Perlin:
+                    colorPos = Mathf.PerlinNoise(pos.x, pos.z);
+                    break;
+                case DistrbuitionType.Random:
+                    alphaPos = Random.Next();
                     break;
             }
 
-            Color c = Color.Evaluate(colorPos);
-            c.a *= Alpha.Evaluate(alphaPos) * AlphaMultiplayer;
+            Color c = Color.Evaluate(Mathf.Lerp(colorPos,Random.Next(),ColorVariation));
+            c.a *= Alpha.Evaluate(Mathf.Lerp(alphaPos,Random.Next(),AlphaVariation)) * AlphaMultiplayer;
             return c;
         }
 
-        public float GetSize(float distance, float GalaxySize, float angle, float index)
+        public float GetSize(Vector3 pos,float distance, float GalaxySize, float angle, float index)
         {
             float sizePos = 0;
-            float rand = Random.Next();
             switch (SizeDistributionType)
             {
-                case ParticlesPrefab.Distribution.Angle:
-                    sizePos = Mathf.Lerp((Mathf.Cos(angle) + 1) / 2f, rand, SizeVariation);
+                case DistrbuitionType.Angle:
+                    sizePos = (Mathf.Cos(angle) + 1) / 2f;
                     break;
-                case ParticlesPrefab.Distribution.Distance:
-                    sizePos = Mathf.Lerp(sizePos, rand, SizeVariation);
+                case DistrbuitionType.Distance:
+                    sizePos = distance / GalaxySize;
                     break;
-                case ParticlesPrefab.Distribution.Linear:
-                    sizePos = Mathf.Lerp((float)index / (float)Count, rand, SizeVariation);
+                case DistrbuitionType.Linear:
+                    sizePos = (float)index / (float)Count;
                     break;
-                case Distribution.Random:
-                    sizePos = rand;
+                case DistrbuitionType.Perlin:
+                    sizePos = Mathf.PerlinNoise(pos.x, pos.z);
+                    break;
+                case DistrbuitionType.Random:
+                    sizePos = Random.Next();
                     break;
             }
 
-            float size = SizeDistribution.Evaluate(sizePos) * Size;
+            float size = SizeDistribution.Evaluate(Mathf.Lerp(sizePos,Random.Next(),SizeVariation)) * Size;
             return size;
+        }
+
+        public float GetRotation()
+        {
+            return Random.Next() * Mathf.PI * 2;
         }
 
         public void UpdateMaterial(GalaxyPrefab prefab)
@@ -154,6 +176,9 @@ namespace Galaxia
                 m_material.SetFloat("GalaxySize", prefab.Size);
                 m_material.SetFloat("MaxScreenSize", MaxScreenSize);
                 m_material.SetFloat("Count", Count);
+                m_material.SetInt("MySrcMode",(int)m_blendModeSrc);
+                m_material.SetInt("MyDstMode", (int)m_blendModeDis);
+                m_material.renderQueue = m_renderQueue;
             }
         }
 
@@ -179,14 +204,14 @@ namespace Galaxia
         public float Size { get { return m_size; } set { m_size = value; } }
         public float MaxScreenSize { get { return m_maxScreenSize; } set { m_maxScreenSize = value; } }
         public AnimationCurve PositionDistribution { get { return m_positionDistribution; } set { m_positionDistribution = value; } }
-        public Distribution SizeDistributionType { get { return m_sizeDistributionType; } set { m_sizeDistributionType = value; } }
+        public DistrbuitionType SizeDistributionType { get { return m_sizeDistributionType; } set { m_sizeDistributionType = value; } }
         public AnimationCurve SizeDistribution { get { return m_sizeDistribution; } set { m_sizeDistribution = value; } }
         public float SizeVariation { get { return m_sizeVariation; } set { m_sizeVariation = value; } }
-        public Distribution AlphaDistributionType { get { return m_alphaDistributionType; } set { m_alphaDistributionType = value; } }
+        public DistrbuitionType AlphaDistributionType { get { return m_alphaDistributionType; } set { m_alphaDistributionType = value; } }
         public AnimationCurve Alpha { get { return m_alpha; } set { m_alpha = value; } }
         public float AlphaVariation { get { return m_alphaVariation; } set { m_alphaVariation = value; } }
         public float AlphaMultiplayer { get { return m_alphaMultiplayer; } set { m_alphaMultiplayer = value; } }
-        public Distribution ColorDistributionType { get { return m_colorDistributionType; } set { m_colorDistributionType = value; } }
+        public DistrbuitionType ColorDistributionType { get { return m_colorDistributionType; } set { m_colorDistributionType = value; } }
         public Gradient Color { get { return m_color; } set { m_color = value; } }
         public float ColorVariation { get { return m_colorVariation; } set { m_colorVariation = value; } }
         public Texture2D Texture { get { return m_texture; } set { m_texture = value; } }
@@ -202,14 +227,6 @@ namespace Galaxia
             SmallStars,
             BigStars,
             Dust
-        }
-
-        public enum Distribution
-        {
-            Linear,
-            Distance,
-            Angle,
-            Random,
         }
         #endregion
     }
