@@ -236,7 +236,7 @@ namespace Galaxia
                 Vector3[] vertex = new Vector3[size];
                 Color[] color = new Color[size];
                 Vector2[] info = new Vector2[size];
-                Vector2[] indexStartTime = new Vector2[size];
+                Vector2[] sheetPos = new Vector2[size];
                 int[] indexes = new int[size];
 
                 for (int e = 0; e < size; e++)
@@ -245,15 +245,14 @@ namespace Galaxia
                     color[e] = m_particleList[i * MAX_VERTEX_PER_MESH + e].color;
                     info[e].x = m_particleList[i * MAX_VERTEX_PER_MESH + e].size;
                     info[e].y = m_particleList[i * MAX_VERTEX_PER_MESH + e].rotation;
-                    indexStartTime[e].x = m_particleList[i * MAX_VERTEX_PER_MESH + e].index;
-                    indexStartTime[e].y = m_particleList[i * MAX_VERTEX_PER_MESH + e].startingTime;
+                    sheetPos[e].x = Random.Next(0, (int)Mathf.Pow(Prefab.TextureSheetPow, 2));
                     indexes[e] = e;
                 }
 
                 m_meshes[i].vertices = vertex;
                 m_meshes[i].colors = color;
                 m_meshes[i].uv = info;
-                m_meshes[i].uv1 = indexStartTime;
+                m_meshes[i].uv1 = sheetPos;
                 m_meshes[i].SetIndices(indexes, MeshTopology.Points, 0);
                 m_meshes[i].RecalculateBounds();
 

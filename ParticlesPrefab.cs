@@ -18,6 +18,7 @@ namespace Galaxia
         [SerializeField]
         private float m_size = 0.1f;
         [SerializeField]
+        [Range(0,1)]
         private float m_maxScreenSize = 0.1f;
         [Header("Distribution")]
         [CurveRange(0, 0, 1, 1)]
@@ -52,6 +53,8 @@ namespace Galaxia
         private int m_renderQueue = 0;
         [SerializeField]
         private Texture2D m_texture;
+        [SerializeField]
+        private int m_textureSheetPower = 1;
 
         #region hidden
         [SerializeField]
@@ -87,7 +90,7 @@ namespace Galaxia
                     colorPos = (float)index / (float)Count;
                     break;
                 case DistrbuitionType.Perlin:
-                    colorPos = Mathf.PerlinNoise(pos.x / GalaxySize, pos.z / GalaxySize);
+                    colorPos = Mathf.Pow(SimplexNoise.Generate(pos.x * m_colorDistributor.Frequency, pos.y * m_colorDistributor.Frequency, pos.z * m_colorDistributor.Frequency), m_colorDistributor.Amplitude);
                     break;
                 case DistrbuitionType.Random:
                     colorPos = Random.Next();
@@ -106,7 +109,7 @@ namespace Galaxia
                     alphaPos = (float)index / (float)Count;
                     break;
                 case DistrbuitionType.Perlin:
-                    colorPos = Mathf.PerlinNoise(pos.x, pos.z);
+                    alphaPos = Mathf.Pow(SimplexNoise.Generate(pos.x * m_alphaDistributor.Frequency, pos.y * m_colorDistributor.Frequency, pos.z * m_alphaDistributor.Frequency), m_alphaDistributor.Amplitude);
                     break;
                 case DistrbuitionType.Random:
                     alphaPos = Random.Next();
@@ -133,7 +136,7 @@ namespace Galaxia
                     sizePos = (float)index / (float)Count;
                     break;
                 case DistrbuitionType.Perlin:
-                    sizePos = Mathf.PerlinNoise(pos.x, pos.z);
+                    sizePos = Mathf.Pow(SimplexNoise.Generate(pos.x * m_sizeDistributor.Frequency, pos.y * m_colorDistributor.Frequency, pos.z * m_sizeDistributor.Frequency), m_sizeDistributor.Amplitude);
                     break;
                 case DistrbuitionType.Random:
                     sizePos = Random.Next();
@@ -163,6 +166,7 @@ namespace Galaxia
                 m_material.SetFloat("GalaxySize", prefab.Size);
                 m_material.SetFloat("MaxScreenSize", MaxScreenSize);
                 m_material.SetFloat("Count", Count);
+                m_material.SetInt("TextureSheetPower", m_textureSheetPower);
                 m_material.SetInt("MySrcMode",(int)m_blendModeSrc);
                 m_material.SetInt("MyDstMode", (int)m_blendModeDis);
                 m_material.renderQueue = m_renderQueue;
@@ -190,6 +194,7 @@ namespace Galaxia
         public int Seed { get { return m_seed; } set { m_seed = value; } }
         public float Size { get { return m_size; } set { m_size = value; } }
         public float MaxScreenSize { get { return m_maxScreenSize; } set { m_maxScreenSize = value; } }
+        public int TextureSheetPow { get { return m_textureSheetPower; } set { m_textureSheetPower = value; } }
         public DistributionProperty SizeDistributor { get { return m_sizeDistributor; } set { m_sizeDistributor = value; } }
         public DistributionProperty AlphaDistributor { get { return m_alphaDistributor; } set { m_alphaDistributor = value; } }
         public DistributionProperty ColorDistributor { get { return m_colorDistributor; } set { m_colorDistributor = value; } }

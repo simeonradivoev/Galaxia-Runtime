@@ -66,6 +66,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Random.cs" />
+    <Compile Include="SimplexNoise.cs" />
     <Compile Include="StarFinder.cs" />
   </ItemGroup>
   <ItemGroup>
