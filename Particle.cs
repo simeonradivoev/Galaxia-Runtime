@@ -31,7 +31,7 @@ namespace Galaxia
             particle.lifetime = Mathf.Infinity;
             particle.startLifetime = Mathf.Infinity;
             particle.size = p.size;
-            particle.rotation = p.rotation;
+            particle.rotation = p.rotation * Mathf.Rad2Deg;
             return particle;
         }
 

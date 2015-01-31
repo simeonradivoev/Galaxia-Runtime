@@ -105,6 +105,7 @@ namespace Galaxia
                 }
                 else
                 {
+                    m_renderers = new GameObject[1];
                     GameObject g = new GameObject("Shuriken Renderer",typeof(ParticleSystem));
                     g.transform.parent = transform;
                     ParticleSystem system = g.GetComponent<ParticleSystem>();
@@ -114,6 +115,7 @@ namespace Galaxia
                     system.renderer.material.mainTexture = m_prefab.Texture;
                     system.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
                     system.Stop();
+                    m_renderers[0] = g;
                 }
 
                 m_needsRebuild = false;
@@ -128,7 +130,15 @@ namespace Galaxia
                 {
                     UpdateRenderer();
                     UpdateParticleList();
-                    UpdateMeshes();
+                    if (Galaxy.DirectX11)
+                    {
+                        UpdateMeshes();
+                    }
+                    else
+                    {
+                        UpdateShuriken();
+                    }
+                    
                 }
                 else
                 {
@@ -250,6 +260,17 @@ namespace Galaxia
 
             }
         }
+
+        void UpdateShuriken()
+        {
+            foreach(GameObject g in Renderers)
+            {
+                if(g.particleSystem != null)
+                {
+                    g.particleSystem.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
+                }
+            }
+        }
         /// <summary>
         /// Update all parameters of the renderer
         /// </summary>
@@ -347,6 +368,7 @@ namespace Galaxia
         public bool NeedsRebuild { get { return m_needsRebuild; } set { m_needsRebuild = value; } }
         public bool NeedsUpdate { get { return m_needsUpdate; } set { m_needsUpdate = value; } }
         public GalaxyPrefab GalaxyPrefab { get { return m_galaxyPrefab; } set { m_galaxyPrefab = value; } }
+        public Galaxy Galaxy { get { return transform.parent.GetComponent<Galaxy>(); } }
         #endregion
     }
 }

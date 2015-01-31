@@ -60,7 +60,7 @@ namespace Galaxia
                         #endif
                         obj.transform.parent = transform;
                         Particles p = obj.GetComponent<Particles>();
-                        p.Generate(prefab, GalaxyPrefab,m_directx11);
+                        p.Generate(prefab, GalaxyPrefab,DirectX11);
                         particles.Add(p);
                         prefab.UpdateMaterial(GalaxyPrefab);
                     }
@@ -251,7 +251,7 @@ namespace Galaxia
         }
         public bool DirectX11
         {
-            get { return m_directx11; }
+            get { return m_directx11 && SystemInfo.graphicsShaderLevel >= 40; }
             set
             {
                 if (m_directx11 != value)
