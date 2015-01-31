@@ -24,39 +24,24 @@ namespace Galaxia
         [SerializeField]
         private AnimationCurve m_positionDistribution = AnimationCurve.Linear(0,0,1,1);
 
-        [Header("Size")]
+        // Size -------------------------------------------
         [SerializeField]
-        private DistrbuitionType m_sizeDistributionType;
-        [CurveRange(0, 0, 1, 1)]
-        [SerializeField]
-        private AnimationCurve m_sizeDistribution = AnimationCurve.Linear(0, 1, 1, 1);
-        [Range(0, 1)]
-        [SerializeField]
-        private float m_sizeVariation = 0;
+        [HideInInspector]
+        private DistributionProperty m_sizeDistributor = new DistributionProperty(DistrbuitionType.Linear,AnimationCurve.Linear(0, 1, 1, 1),0,1);
 
-        [Header("Alpha")]
+        // Alpha ------------------------------------------------
         [SerializeField]
-        private DistrbuitionType m_alphaDistributionType;
-        [CurveRange(0, 0, 1, 1)]
-        [SerializeField]
-        private AnimationCurve m_alpha = DefaultResources.AlphaCurve;
-        [Range(0, 1)]
-        [SerializeField]
-        private float m_alphaVariation = 0;
-        [Range(0, 1)]
-        [SerializeField]
-        private float m_alphaMultiplayer = 1;
+        [HideInInspector]
+        private DistributionProperty m_alphaDistributor = new DistributionProperty(DistrbuitionType.Linear, DefaultResources.AlphaCurve, 0, 1);
 
-        [Header("Color")]
+        // Color -------------------------------------------
         [SerializeField]
-        private DistrbuitionType m_colorDistributionType;
+        [HideInInspector]
+        public DistributionProperty m_colorDistributor = new DistributionProperty(DistrbuitionType.Linear, AnimationCurve.Linear(0, 1, 1, 1), 0, 1);
         [SerializeField]
+        [HideInInspector]
         private Gradient m_color = DefaultResources.StarColorGradient;
-        [Range(0, 1)]
-        [SerializeField]
-        private float m_colorVariation = 0;
-        [SerializeField]
-        private Texture2D m_texture;
+        
 
         [Header("Rendering")]
         [SerializeField]
@@ -65,6 +50,8 @@ namespace Galaxia
         private UnityEngine.Rendering.BlendMode m_blendModeDis = UnityEngine.Rendering.BlendMode.One;
         [SerializeField]
         private int m_renderQueue = 0;
+        [SerializeField]
+        private Texture2D m_texture;
 
         #region hidden
         [SerializeField]
@@ -88,7 +75,7 @@ namespace Galaxia
         {
             float colorPos = 0;
             float alphaPos = 0;
-            switch (m_colorDistributionType)
+            switch (m_colorDistributor.Type)
             {
                 case DistrbuitionType.Angle:
                     colorPos = (Mathf.Cos(angle) + 1) / 2f;
@@ -107,7 +94,7 @@ namespace Galaxia
                     break;
             }
 
-            switch (m_alphaDistributionType)
+            switch (m_alphaDistributor.Type)
             {
                 case DistrbuitionType.Angle:
                     alphaPos = (Mathf.Cos(angle) + 1) / 2f;
@@ -126,15 +113,15 @@ namespace Galaxia
                     break;
             }
 
-            Color c = Color.Evaluate(Mathf.Lerp(colorPos,Random.Next(),ColorVariation));
-            c.a *= Alpha.Evaluate(Mathf.Lerp(alphaPos,Random.Next(),AlphaVariation)) * AlphaMultiplayer;
+            Color c = Color.Evaluate(Mathf.Lerp(colorPos,Random.Next(),m_colorDistributor.Variation)) * m_colorDistributor.Multiplayer;
+            c.a *= Mathf.Lerp(m_alphaDistributor.DistributionCurve.Evaluate(alphaPos), Random.Next(), m_alphaDistributor.Variation) * m_alphaDistributor.Multiplayer * m_colorDistributor.DistributionCurve.Evaluate(colorPos);
             return c;
         }
 
         public float GetSize(Vector3 pos,float distance, float GalaxySize, float angle, float index)
         {
             float sizePos = 0;
-            switch (SizeDistributionType)
+            switch (m_sizeDistributor.Type)
             {
                 case DistrbuitionType.Angle:
                     sizePos = (Mathf.Cos(angle) + 1) / 2f;
@@ -153,7 +140,7 @@ namespace Galaxia
                     break;
             }
 
-            float size = SizeDistribution.Evaluate(Mathf.Lerp(sizePos,Random.Next(),SizeVariation)) * Size;
+            float size = Mathf.Lerp(m_sizeDistributor.DistributionCurve.Evaluate(sizePos), Random.Next(), m_sizeDistributor.Variation) * Size;
             return size;
         }
 
@@ -203,17 +190,11 @@ namespace Galaxia
         public int Seed { get { return m_seed; } set { m_seed = value; } }
         public float Size { get { return m_size; } set { m_size = value; } }
         public float MaxScreenSize { get { return m_maxScreenSize; } set { m_maxScreenSize = value; } }
+        public DistributionProperty SizeDistributor { get { return m_sizeDistributor; } set { m_sizeDistributor = value; } }
+        public DistributionProperty AlphaDistributor { get { return m_alphaDistributor; } set { m_alphaDistributor = value; } }
+        public DistributionProperty ColorDistributor { get { return m_colorDistributor; } set { m_colorDistributor = value; } }
         public AnimationCurve PositionDistribution { get { return m_positionDistribution; } set { m_positionDistribution = value; } }
-        public DistrbuitionType SizeDistributionType { get { return m_sizeDistributionType; } set { m_sizeDistributionType = value; } }
-        public AnimationCurve SizeDistribution { get { return m_sizeDistribution; } set { m_sizeDistribution = value; } }
-        public float SizeVariation { get { return m_sizeVariation; } set { m_sizeVariation = value; } }
-        public DistrbuitionType AlphaDistributionType { get { return m_alphaDistributionType; } set { m_alphaDistributionType = value; } }
-        public AnimationCurve Alpha { get { return m_alpha; } set { m_alpha = value; } }
-        public float AlphaVariation { get { return m_alphaVariation; } set { m_alphaVariation = value; } }
-        public float AlphaMultiplayer { get { return m_alphaMultiplayer; } set { m_alphaMultiplayer = value; } }
-        public DistrbuitionType ColorDistributionType { get { return m_colorDistributionType; } set { m_colorDistributionType = value; } }
         public Gradient Color { get { return m_color; } set { m_color = value; } }
-        public float ColorVariation { get { return m_colorVariation; } set { m_colorVariation = value; } }
         public Texture2D Texture { get { return m_texture; } set { m_texture = value; } }
         public Preset OriginalPreset { get { return m_originalPreset; } set { m_originalPreset = value; } }
         public Material Material { get { return m_material; } set { m_material = value; } }

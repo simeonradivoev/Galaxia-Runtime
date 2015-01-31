@@ -61,19 +61,19 @@ namespace Galaxia
                     prefab.Size = 0.4f;
                     prefab.MaxScreenSize = 0.04f;
                     prefab.Texture = DefaultResources.StarTexture;
-                    prefab.ColorVariation = 0.6f;
+                    prefab.ColorDistributor.Variation = 0.6f;
                     break;
                 case ParticlesPrefab.Preset.BigStars:
                     prefab.Size = 1;
                     prefab.MaxScreenSize = 0.1f;
-                    prefab.ColorVariation = 0.4f;
+                    prefab.ColorDistributor.Variation = 0.4f;
                     prefab.Texture = DefaultResources.StarTexture;
                     break;
                 case ParticlesPrefab.Preset.Dust:
                     prefab.Size = 3;
                     prefab.MaxScreenSize = 0.25f;
-                    prefab.AlphaMultiplayer = 0.02f;
-                    prefab.ColorVariation = 0.1f;
+                    prefab.AlphaDistributor.Multiplayer = 0.02f;
+                    prefab.ColorDistributor.Variation = 0.1f;
                     prefab.Texture = DefaultResources.DustTexture;
                     break;
             }
