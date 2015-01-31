@@ -30,6 +30,11 @@ namespace Galaxia
         [HideInInspector]
         private DistributionProperty m_sizeDistributor = new DistributionProperty(DistrbuitionType.Linear,AnimationCurve.Linear(0, 1, 1, 1),0,1);
 
+        // Rotation ----------------------------------------------
+        [SerializeField]
+        [HideInInspector]
+        private DistributionProperty m_rotationDistributor = new DistributionProperty(DistrbuitionType.Random, AnimationCurve.Linear(0, 1, 1, 1), 0, 1);
+
         // Alpha ------------------------------------------------
         [SerializeField]
         [HideInInspector]
@@ -76,75 +81,56 @@ namespace Galaxia
 
         public Color GetColor(Vector3 pos,float distance, float GalaxySize, float angle,float index)
         {
-            float colorPos = 0;
-            float alphaPos = 0;
-            switch (m_colorDistributor.Type)
-            {
-                case DistrbuitionType.Angle:
-                    colorPos = (Mathf.Cos(angle) + 1) / 2f;
-                    break;
-                case DistrbuitionType.Distance:
-                    colorPos = distance / GalaxySize;
-                    break;
-                case DistrbuitionType.Linear:
-                    colorPos = (float)index / (float)Count;
-                    break;
-                case DistrbuitionType.Perlin:
-                    colorPos = Mathf.Pow(SimplexNoise.Generate(pos.x * m_colorDistributor.Frequency, pos.y * m_colorDistributor.Frequency, pos.z * m_colorDistributor.Frequency), m_colorDistributor.Amplitude);
-                    break;
-                case DistrbuitionType.Random:
-                    colorPos = Random.Next();
-                    break;
-            }
-
-            switch (m_alphaDistributor.Type)
-            {
-                case DistrbuitionType.Angle:
-                    alphaPos = (Mathf.Cos(angle) + 1) / 2f;
-                    break;
-                case DistrbuitionType.Distance:
-                    alphaPos = distance / GalaxySize;
-                    break;
-                case DistrbuitionType.Linear:
-                    alphaPos = (float)index / (float)Count;
-                    break;
-                case DistrbuitionType.Perlin:
-                    alphaPos = Mathf.Pow(SimplexNoise.Generate(pos.x * m_alphaDistributor.Frequency, pos.y * m_colorDistributor.Frequency, pos.z * m_alphaDistributor.Frequency), m_alphaDistributor.Amplitude);
-                    break;
-                case DistrbuitionType.Random:
-                    alphaPos = Random.Next();
-                    break;
-            }
-
+            float colorPos = GetEvaluationPosition(m_colorDistributor, pos, distance, GalaxySize, angle, index);
+            float alphaPos = GetEvaluationPosition(m_alphaDistributor,pos,distance,GalaxySize,angle,index);
             Color c = Color.Evaluate(Mathf.Lerp(colorPos,Random.Next(),m_colorDistributor.Variation)) * m_colorDistributor.Multiplayer;
             c.a *= Mathf.Lerp(m_alphaDistributor.DistributionCurve.Evaluate(alphaPos), Random.Next(), m_alphaDistributor.Variation) * m_alphaDistributor.Multiplayer * m_colorDistributor.DistributionCurve.Evaluate(colorPos);
             return c;
         }
 
+
         public float GetSize(Vector3 pos,float distance, float GalaxySize, float angle, float index)
         {
-            float sizePos = 0;
-            switch (m_sizeDistributor.Type)
+            float sizePos = GetEvaluationPosition(m_sizeDistributor, pos, distance, GalaxySize, angle, index);
+            float size = Mathf.Lerp(m_sizeDistributor.DistributionCurve.Evaluate(sizePos), Random.Next(), m_sizeDistributor.Variation) * Size;
+            return size * m_sizeDistributor.Multiplayer;
+        }
+
+        public float GetRotation(Vector3 pos, float distance, float GalaxySize, float angle, float index)
+        {
+            float rotationPos = GetEvaluationPosition(m_rotationDistributor, pos, distance, GalaxySize, angle, index);
+            float rotation = Mathf.Lerp(m_rotationDistributor.DistributionCurve.Evaluate(rotationPos), Random.Next(), m_rotationDistributor.Variation) * Mathf.PI * 2;
+            return rotation * m_rotationDistributor.Multiplayer;
+        }
+
+        
+        /// <summary>
+        /// gets the evaluation value for animation curves of gradients for a given distributor and type
+        /// </summary>
+        /// <param name="distributor">The distributor to use</param>
+        /// <param name="pos">the world position</param>
+        /// <param name="distance">distance from the center</param>
+        /// <param name="GalaxySize">size of the galaxy</param>
+        /// <param name="angle">angle</param>
+        /// <param name="index">index of the particle (can be any value)</param>
+        /// <returns></returns>
+        float GetEvaluationPosition(DistributionProperty distributor,Vector3 pos, float distance, float GalaxySize, float angle, float index)
+        {
+            switch (distributor.Type)
             {
                 case DistrbuitionType.Angle:
-                    sizePos = (Mathf.Cos(angle) + 1) / 2f;
-                    break;
+                    return (Mathf.Cos(angle) + 1) / 2f;
                 case DistrbuitionType.Distance:
-                    sizePos = distance / GalaxySize;
-                    break;
+                    return distance / GalaxySize;
                 case DistrbuitionType.Linear:
-                    sizePos = (float)index / (float)Count;
-                    break;
+                    return (float)index / (float)Count;
                 case DistrbuitionType.Perlin:
-                    sizePos = Mathf.Pow(SimplexNoise.Generate(pos.x * m_sizeDistributor.Frequency, pos.y * m_colorDistributor.Frequency, pos.z * m_sizeDistributor.Frequency), m_sizeDistributor.Amplitude);
-                    break;
+                    return Mathf.Pow(SimplexNoise.Generate(pos.x * distributor.Frequency, pos.y * distributor.Frequency, pos.z * distributor.Frequency), distributor.Amplitude);
                 case DistrbuitionType.Random:
-                    sizePos = Random.Next();
-                    break;
+                    return Random.Next();
+                default:
+                    return 0;
             }
-
-            float size = Mathf.Lerp(m_sizeDistributor.DistributionCurve.Evaluate(sizePos), Random.Next(), m_sizeDistributor.Variation) * Size;
-            return size;
         }
 
         public float GetRotation()
@@ -196,6 +182,7 @@ namespace Galaxia
         public float MaxScreenSize { get { return m_maxScreenSize; } set { m_maxScreenSize = value; } }
         public int TextureSheetPow { get { return m_textureSheetPower; } set { m_textureSheetPower = value; } }
         public DistributionProperty SizeDistributor { get { return m_sizeDistributor; } set { m_sizeDistributor = value; } }
+        public DistributionProperty RotationDistributor { get { return m_rotationDistributor; } set { m_rotationDistributor = value; } }
         public DistributionProperty AlphaDistributor { get { return m_alphaDistributor; } set { m_alphaDistributor = value; } }
         public DistributionProperty ColorDistributor { get { return m_colorDistributor; } set { m_colorDistributor = value; } }
         public AnimationCurve PositionDistribution { get { return m_positionDistribution; } set { m_positionDistribution = value; } }

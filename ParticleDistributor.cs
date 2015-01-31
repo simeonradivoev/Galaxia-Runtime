@@ -12,6 +12,12 @@ namespace Galaxia
         #endregion
         #region Abstract methods
         public abstract void Process(ProcessContext context);
+        protected virtual void ProcessProperties(ProcessContext context,Vector3 pos,float angle)
+        {
+            context.particle.color = context.particles.GetColor(pos, pos.magnitude, context.galaxy.Size, angle, context.particle.index);
+            context.particle.size = context.particles.GetSize(pos, pos.magnitude, context.galaxy.Size, angle, context.particle.index);
+            context.particle.rotation = context.particles.GetRotation(pos, pos.magnitude, context.galaxy.Size, angle, context.particle.index);
+        }
         public virtual void UpdateMaterial(Material material)
         {
 

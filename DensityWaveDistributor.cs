@@ -65,12 +65,13 @@ namespace Galaxia
 
             context.particle.startingTime = Random.Next(0f, (2f * Mathf.PI));
             float _angleRotation = context.time + context.particle.startingTime;
+            float ellipseRotation = _angleRotation / T;
 
             float CosB = Mathf.Cos(angle);								//the Cos of the rotation angle of the ellipse
             float SinB = Mathf.Sin(angle);								//the Sin of the rotation angle of the ellipse
 
-            float x = (a * Mathf.Cos(_angleRotation / T)) + _centerX;
-            float z = (b * Mathf.Sin(_angleRotation / T));
+            float x = (a * Mathf.Cos(ellipseRotation)) + _centerX;
+            float z = (b * Mathf.Sin(ellipseRotation));
 
             Vector3 _pos = new Vector3(((x * CosB) + (z * SinB)) * context.galaxy.Size, 0, ((x * SinB) - (z * CosB)) * context.galaxy.Size);
 
@@ -79,9 +80,7 @@ namespace Galaxia
             height *= GalaxyHeightMultiply.Evaluate(context.index / (float)context.particles.Count);
             _pos.y = height;
 
-            context.particle.color = context.particles.GetColor(_pos,_pos.magnitude, context.galaxy.Size, _angleRotation / T, context.particle.index);
-            context.particle.size = context.particles.GetSize(_pos,_pos.magnitude, context.galaxy.Size, _angleRotation / T, context.particle.index);
-            context.particle.rotation = context.particles.GetRotation();
+            ProcessProperties(context,_pos,ellipseRotation);
 
             context.particle.position = _pos;
         }
