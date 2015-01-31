@@ -234,7 +234,7 @@ namespace Galaxia
                     vertex[e] = m_particleList[i * MAX_VERTEX_PER_MESH + e].position;
                     color[e] = m_particleList[i * MAX_VERTEX_PER_MESH + e].color;
                     info[e].x = m_particleList[i * MAX_VERTEX_PER_MESH + e].size;
-                    info[e].y = m_particleList[i * MAX_VERTEX_PER_MESH + e].focalPoint;
+                    info[e].y = m_particleList[i * MAX_VERTEX_PER_MESH + e].rotation;
                     indexStartTime[e].x = m_particleList[i * MAX_VERTEX_PER_MESH + e].index;
                     indexStartTime[e].y = m_particleList[i * MAX_VERTEX_PER_MESH + e].startingTime;
                     indexes[e] = e;

@@ -1,4 +1,5 @@
 ﻿//#define HIDE_SUB_ASSETS
+//#define EDIT_RESOURCES
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -54,7 +55,9 @@ namespace Galaxia
                         #if HIDE_SUB_ASSETS
                         obj.hideFlags = HideFlags.HideInHierarchy;
                         #endif
+                        #if EDIT_RESOURCES
                         obj.hideFlags |= HideFlags.NotEditable;
+                        #endif
                         obj.transform.parent = transform;
                         Particles p = obj.GetComponent<Particles>();
                         p.Generate(prefab, GalaxyPrefab,m_directx11);
@@ -235,14 +238,29 @@ namespace Galaxia
             get { return m_galaxy; }
             set
             {
-                m_galaxy = value;
-                if(m_generationType == GalaxyGenerationType.Automatic)
+                if(m_galaxy != value && m_generationType == GalaxyGenerationType.Automatic)
                 {
+                    m_galaxy = value;
+                    GenerateParticles();
+                }
+                else
+                {
+                    m_galaxy = value;
+                }
+            }
+        }
+        public bool DirectX11
+        {
+            get { return m_directx11; }
+            set
+            {
+                if (m_directx11 != value)
+                {
+                    m_directx11 = value;
                     GenerateParticles();
                 }
             }
         }
-        public bool DirectX11 { get { return m_directx11; } set { m_directx11 = value; } }
         #endregion
         #region enums
         public enum GalaxyGenerationType

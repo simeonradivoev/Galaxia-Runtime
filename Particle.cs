@@ -19,6 +19,8 @@ namespace Galaxia
         private float m_startingTime;
         [SerializeField]
         private float m_index;
+        [SerializeField]
+        private float m_rotation;
         #endregion
         #region Methods
         public static implicit operator ParticleSystem.Particle(Particle p)
@@ -44,6 +46,7 @@ namespace Galaxia
         public Vector3 position { get { return m_position; } set { m_position = value; } }
         public Color color { get { return m_color; } set { m_color = value; } }
         public float size { get { return m_size; } set { m_size = value; } }
+        public float rotation { get { return m_rotation; } set { m_rotation = value; } }
         public float focalPoint { get { return m_focalPoint; } set { m_focalPoint = value; } }
         public float startingTime { get { return m_startingTime; } set { m_startingTime = value; } }
         public float index { get { return m_index; } set { m_index = value; } }
