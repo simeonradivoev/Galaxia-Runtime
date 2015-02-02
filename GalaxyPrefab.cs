@@ -176,14 +176,11 @@ namespace Galaxia
 
         public void RecreateAllGalaxies()
         {
-            if (UnityEditorInternal.InternalEditorUtility.HasPro())
+            foreach (Galaxy g in GameObject.FindObjectsOfType<Galaxy>())
             {
-                foreach (Galaxy g in GameObject.FindObjectsOfType<Galaxy>())
+                if (g.GalaxyPrefab == this)
                 {
-                    if (g.GalaxyPrefab == this)
-                    {
-                        g.GenerateParticles();
-                    }
+                    g.GenerateParticles();
                 }
             }
         }

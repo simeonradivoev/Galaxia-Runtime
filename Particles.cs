@@ -113,6 +113,8 @@ namespace Galaxia
                     system.playOnAwake = false;
                     system.renderer.material = Resources.Load<Material>("Materials/ParticleSystemParticle");
                     system.renderer.material.mainTexture = m_prefab.Texture;
+                    system.renderer.castShadows = false;
+                    system.renderer.receiveShadows = false;
                     system.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
                     system.Stop();
                     m_renderers[0] = g;

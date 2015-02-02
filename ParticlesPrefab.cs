@@ -51,7 +51,7 @@ namespace Galaxia
 
         [Header("Rendering")]
         [SerializeField]
-        private UnityEngine.Rendering.BlendMode m_blendModeSrc = UnityEngine.Rendering.BlendMode.One;
+        private UnityEngine.Rendering.BlendMode m_blendModeSrc = UnityEngine.Rendering.BlendMode.SrcAlpha;
         [SerializeField]
         private UnityEngine.Rendering.BlendMode m_blendModeDis = UnityEngine.Rendering.BlendMode.One;
         [SerializeField]
