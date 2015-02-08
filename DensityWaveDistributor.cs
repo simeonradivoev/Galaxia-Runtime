@@ -19,17 +19,10 @@ namespace Galaxia
         [SerializeField]
         private float angleOffset = 8;
         [SerializeField]
-        [CurveRange(0, 0, 1, 1)]
-        private AnimationCurve m_galaxyHeightDistribution = DefaultResources.HeightCurve;
+        private float m_heightVariance = 1;
         [SerializeField]
         [CurveRange(0, 0, 1, 1)]
         private AnimationCurve m_galaxyHeightMultiply = DefaultResources.HeightCurve;
-        [SerializeField]
-        [HideInInspector]
-        private AnimationCurve GalaxyHeightIntegral = Integral(DefaultResources.HeightCurve, 32);
-        [SerializeField]
-        [HideInInspector]
-        private AnimationCurve GalaxyHeightIntegralInverse = Inverse(Integral(DefaultResources.HeightCurve, 32));
         #endregion
         
 
@@ -76,8 +69,8 @@ namespace Galaxia
             Vector3 _pos = new Vector3(((x * CosB) + (z * SinB)) * context.galaxy.Size, 0, ((x * SinB) - (z * CosB)) * context.galaxy.Size);
 
 
-            float height = (Mathf.Clamp01(GalaxyHeightIntegralInverse.Evaluate(Random.Next())) * (context.galaxy.HeightOffset * 2)) - context.galaxy.HeightOffset;
-            height *= GalaxyHeightMultiply.Evaluate(context.index / (float)context.particles.Count);
+            float height = (float)Random.NextGaussianDouble(m_heightVariance) * context.galaxy.HeightOffset;
+            height *= GalaxyHeightMultiply.Evaluate(_pos.magnitude / context.galaxy.Size);
             _pos.y = height;
 
             ProcessProperties(context,_pos,ellipseRotation);
@@ -88,8 +81,8 @@ namespace Galaxia
         public override void RecreateCurves()
         {
             base.RecreateCurves();
-            GalaxyHeightIntegral = ParticleDistributor.Integral(GalaxyHeightDistribution, 64);
-            GalaxyHeightIntegralInverse = Inverse(GalaxyHeightIntegral);
+            //GalaxyHeightIntegral = ParticleDistributor.Integral(GalaxyHeightDistribution, 64);
+            //GalaxyHeightIntegralInverse = Inverse(GalaxyHeightIntegral);
         }
 
         public override void UpdateMaterial(Material material)
@@ -103,7 +96,7 @@ namespace Galaxia
         }
 
         #region Getters and setters
-        public AnimationCurve GalaxyHeightDistribution { get { return m_galaxyHeightDistribution; } set { m_galaxyHeightDistribution = value; RecreateCurves(); } }
+        //public AnimationCurve GalaxyHeightDistribution { get { return m_galaxyHeightDistribution; } set { m_galaxyHeightDistribution = value; RecreateCurves(); } }
         public AnimationCurve GalaxyHeightMultiply { get { return m_galaxyHeightMultiply; } set { m_galaxyHeightMultiply = value; RecreateCurves(); } }
         #endregion
     }

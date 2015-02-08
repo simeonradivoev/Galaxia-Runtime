@@ -54,13 +54,18 @@ namespace Galaxia
             {
                 if (m_prefab != null && m_galaxyPrefab != null)
                 {
-                    Build(m_gpu);
+                    Build();
                 }
             }
 
             if(m_needsUpdate)
             {
                 UpdateParticles();
+            }
+
+            if (GalaxyPrefab != null && Galaxy != null && Galaxy.DirectX11)
+            {
+                Draw();
             }
         }
 
@@ -71,37 +76,37 @@ namespace Galaxia
         /// </summary>
         /// <param name="galaxy">The galaxy prefab</param>
         /// <param name="directx11">if you want to render in directx 11 or not</param>
-        internal void Build(bool directx11)
+        internal void Build()
         {
-            if (m_prefab != null && m_prefab.active)
+            if (m_prefab != null && m_prefab.active && Galaxy != null)
             {
                 //only do geometry shader particles on direct x 10 and above
-                if (directx11 && SystemInfo.graphicsShaderLevel >= 40)
+                if (Galaxy.DirectX11)
                 {
-                    if (m_meshes != null)
-                    {
-                        DestroyRenderers();
-                        m_renderers = new GameObject[m_meshes.Length];
-                        m_prefab.UpdateMaterial(m_galaxyPrefab);
+                    //if (m_meshes != null)
+                    //{
+                    //    DestroyRenderers();
+                    //    m_renderers = new GameObject[m_meshes.Length];
+                    //    m_prefab.UpdateMaterial(m_galaxyPrefab);
 
-                        for (int i = 0; i < m_meshes.Length; i++)
-                        {
-                            GameObject g = new GameObject("Renderer", typeof(MeshRenderer), typeof(MeshFilter));
-                            #if HIDE_SUB_ASSETS
-                            g.hideFlags = HideFlags.HideInHierarchy;
-                            #endif
-                            //g.hideFlags |= HideFlags.DontSave;
-                            g.transform.parent = transform;
-                            g.GetComponent<MeshFilter>().sharedMesh = m_meshes[i];
-                            g.renderer.sharedMaterial = m_prefab.Material;
-                            g.renderer.castShadows = false;
-                            g.renderer.receiveShadows = false;
+                    //    for (int i = 0; i < m_meshes.Length; i++)
+                    //    {
+                    //        GameObject g = new GameObject("Renderer", typeof(MeshRenderer), typeof(MeshFilter));
+                    //        #if HIDE_SUB_ASSETS
+                    //        g.hideFlags = HideFlags.HideInHierarchy;
+                    //        #endif
+                    //        //g.hideFlags |= HideFlags.DontSave;
+                    //        g.transform.parent = transform;
+                    //        g.GetComponent<MeshFilter>().sharedMesh = m_meshes[i];
+                    //        g.renderer.sharedMaterial = m_prefab.Material;
+                    //        g.renderer.castShadows = false;
+                    //        g.renderer.receiveShadows = false;
 
-                            m_renderers[i] = g;
-                        }
+                    //        m_renderers[i] = g;
+                    //    }
 
                         
-                    }
+                    //}
                 }
                 else
                 {
@@ -132,6 +137,7 @@ namespace Galaxia
                 {
                     UpdateRenderer();
                     UpdateParticleList();
+
                     if (Galaxy.DirectX11)
                     {
                         UpdateMeshes();
@@ -174,7 +180,12 @@ namespace Galaxia
         {
             foreach(Mesh m in m_meshes)
             {
-                if (m_prefab.active && m_prefab.Material != null)
+                if (m == null || m_meshes == null)
+                {
+                    UpdateMeshes();
+                }
+
+                if (m != null && m_prefab.active && m_prefab.Material != null)
                 {
                     if (m_prefab.Material.SetPass(0))
                     {
@@ -189,7 +200,12 @@ namespace Galaxia
         {
             foreach (Mesh m in m_meshes)
             {
-                if (m_prefab.active)
+                if (m == null || m_meshes == null)
+                {
+                    UpdateMeshes();
+                }
+
+                if (m != null && m_prefab.active)
                 {
                     Graphics.DrawMesh(m, transform.localToWorldMatrix, m_prefab.Material, 0);
                 }

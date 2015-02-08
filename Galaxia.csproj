@@ -21,6 +21,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Galaxia.XML</DocumentationFile>
+    <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -78,9 +80,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>echo f|xcopy "$(TargetPath)" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\G_Gen\Scripts"/Y
-echo f|xcopy "$(TargetDir)$(TargetName).pdb" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\G_Gen\Scripts"/Y
-"D:\Program Files (x86)\Unity\Editor\Data\Mono\lib\mono\2.0\pdb2mdb.exe" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\G_Gen\Scripts\$(TargetFileName)"</PostBuildEvent>
+    <PostBuildEvent>echo f|xcopy "$(TargetPath)" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\Galaxia\Scripts"/Y
+
+echo f|xcopy "$(TargetDir)$(TargetName).pdb" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\Galaxia\Scripts"/Y
+
+echo f|xcopy "$(TargetDir)$(TargetName).XML" "\\SIMEON-SERVER\www\Documentation\Galaxia"/Y
+
+"D:\Program Files (x86)\Unity\Editor\Data\Mono\lib\mono\2.0\pdb2mdb.exe" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\Galaxia\Scripts\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace Galaxia
 {
+    /// <summary>
+    /// Holder for all properties on the different particles in a GalaxyPrefab
+    /// </summary>
     public class ParticlesPrefab : ScriptableObject
     {
         #region Public
@@ -60,6 +63,9 @@ namespace Galaxia
         private Texture2D m_texture;
         [SerializeField]
         private int m_textureSheetPower = 1;
+        [SerializeField]
+        [HideInInspector]
+        private Color m_colorOverlay = UnityEngine.Color.white;
 
         #region hidden
         [SerializeField]
@@ -102,18 +108,7 @@ namespace Galaxia
             float rotation = Mathf.Lerp(m_rotationDistributor.DistributionCurve.Evaluate(rotationPos), Random.Next(), m_rotationDistributor.Variation) * Mathf.PI * 2;
             return rotation * m_rotationDistributor.Multiplayer;
         }
-
         
-        /// <summary>
-        /// gets the evaluation value for animation curves of gradients for a given distributor and type
-        /// </summary>
-        /// <param name="distributor">The distributor to use</param>
-        /// <param name="pos">the world position</param>
-        /// <param name="distance">distance from the center</param>
-        /// <param name="GalaxySize">size of the galaxy</param>
-        /// <param name="angle">angle</param>
-        /// <param name="index">index of the particle (can be any value)</param>
-        /// <returns></returns>
         float GetEvaluationPosition(DistributionProperty distributor,Vector3 pos, float distance, float GalaxySize, float angle, float index)
         {
             switch (distributor.Type)
@@ -149,9 +144,8 @@ namespace Galaxia
             if (prefab != null && m_material != null)
             {
                 m_material.mainTexture = Texture;
-                m_material.SetFloat("GalaxySize", prefab.Size);
+                m_material.color = m_colorOverlay;
                 m_material.SetFloat("MaxScreenSize", MaxScreenSize);
-                m_material.SetFloat("Count", Count);
                 m_material.SetInt("TextureSheetPower", m_textureSheetPower);
                 m_material.SetInt("MySrcMode",(int)m_blendModeSrc);
                 m_material.SetInt("MyDstMode", (int)m_blendModeDis);
@@ -163,8 +157,8 @@ namespace Galaxia
         {
             if (prefab != null && m_material != null)
             {
-                m_material.SetInt("Animate", Animate ? 1 : 0);
-                m_material.SetFloat("AnimationSpeed", speed);
+                //m_material.SetInt("Animate", Animate ? 1 : 0);
+                //m_material.SetFloat("AnimationSpeed", speed);
             }
         }
 
@@ -176,20 +170,117 @@ namespace Galaxia
 
         #region Getters and Setters
         public bool active { get { return m_active; } set { m_active = value; } }
-        public int Count { get { return m_count; } set { m_count = value; } }
-        public int Seed { get { return m_seed; } set { m_seed = value; } }
-        public float Size { get { return m_size; } set { m_size = value; } }
+        public int Count
+        {
+            get { return m_count; }
+            set
+            {
+                m_count = value;
+                if (GalaxyPrefab != null)
+                    GalaxyPrefab.RecreateAllGalaxies();
+            }
+        }
+        public int Seed
+        {
+            get { return m_seed; }
+            set
+            {
+                m_seed = value;
+                if (GalaxyPrefab != null)
+                    GalaxyPrefab.UpdateAllGalaxies(this);
+            }
+        }
+        public float Size
+        {
+            get { return m_size; }
+            set
+            {
+                m_size = value;
+                if (GalaxyPrefab != null)
+                    GalaxyPrefab.UpdateAllGalaxies(this);
+            }
+        }
         public float MaxScreenSize { get { return m_maxScreenSize; } set { m_maxScreenSize = value; } }
         public int TextureSheetPow { get { return m_textureSheetPower; } set { m_textureSheetPower = value; } }
-        public DistributionProperty SizeDistributor { get { return m_sizeDistributor; } set { m_sizeDistributor = value; } }
-        public DistributionProperty RotationDistributor { get { return m_rotationDistributor; } set { m_rotationDistributor = value; } }
-        public DistributionProperty AlphaDistributor { get { return m_alphaDistributor; } set { m_alphaDistributor = value; } }
-        public DistributionProperty ColorDistributor { get { return m_colorDistributor; } set { m_colorDistributor = value; } }
-        public AnimationCurve PositionDistribution { get { return m_positionDistribution; } set { m_positionDistribution = value; } }
-        public Gradient Color { get { return m_color; } set { m_color = value; } }
-        public Texture2D Texture { get { return m_texture; } set { m_texture = value; } }
-        public Preset OriginalPreset { get { return m_originalPreset; } set { m_originalPreset = value; } }
-        public Material Material { get { return m_material; } set { m_material = value; } }
+        public DistributionProperty SizeDistributor
+        {
+            get { return m_sizeDistributor; }
+            set
+            {
+                m_sizeDistributor = value;
+                if (GalaxyPrefab != null)
+                    GalaxyPrefab.UpdateAllGalaxies(this);
+            }
+        }
+        public DistributionProperty RotationDistributor
+        {
+            get { return m_rotationDistributor; }
+            set
+            {
+                m_rotationDistributor = value;
+                if (GalaxyPrefab != null)
+                    GalaxyPrefab.UpdateAllGalaxies(this);
+            }
+        }
+        public DistributionProperty AlphaDistributor
+        {
+            get { return m_alphaDistributor; }
+            set
+            {
+                m_alphaDistributor = value;
+                if (GalaxyPrefab != null)
+                    GalaxyPrefab.UpdateAllGalaxies(this);
+            }
+        }
+        public DistributionProperty ColorDistributor
+        {
+            get { return m_colorDistributor; }
+            set
+            {
+                m_colorDistributor = value;
+                if (GalaxyPrefab != null)
+                    GalaxyPrefab.UpdateAllGalaxies(this);
+            }
+        }
+        public AnimationCurve PositionDistribution
+        {
+            get { return m_positionDistribution; }
+            set
+            {
+                m_positionDistribution = value;
+                if (GalaxyPrefab != null)
+                    GalaxyPrefab.UpdateAllGalaxies(this);
+            }
+        }
+        public Gradient Color
+        {
+            get { return m_color; }
+            set
+            {
+                m_color = value;
+                if (GalaxyPrefab != null)
+                    GalaxyPrefab.UpdateAllGalaxies(this);
+            }
+        }
+        public Color ColorOverlay
+        {
+            get { return m_colorOverlay; }
+            set
+            {
+                m_colorOverlay = value;
+                UpdateMaterial(GalaxyPrefab);
+            }
+        }
+        public Texture2D Texture
+        {
+            get { return m_texture; }
+            set
+            {
+                m_texture = value;
+            }
+        }
+        public Preset OriginalPreset { get { return m_originalPreset; } internal set { m_originalPreset = value; } }
+        public Material Material { get { return m_material; } internal set { m_material = value; } }
         public GalaxyPrefab GalaxyPrefab { get { return m_galaxyPrefab; } }
         #endregion
 

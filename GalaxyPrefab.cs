@@ -1,10 +1,13 @@
-﻿//#define HIDE_SUB_ASSETS
-//#define CAN_EDIT_RESOURCES
+﻿#define HIDE_SUB_ASSETS
+#define CAN_EDIT_RESOURCES
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace Galaxia
 {
+    /// <summary>
+    /// The holder of all the ParticlesPrefab
+    /// </summary>
     public class GalaxyPrefab : ScriptableObject, IEnumerable<ParticlesPrefab>, ICollection<ParticlesPrefab>
     {
         #region Public
@@ -20,7 +23,8 @@ namespace Galaxia
         private float m_size = 100;
         [SerializeField]
         private float m_heightOffset = 10;
-         [SerializeField]
+        [SerializeField]
+        [HideInInspector]
         [CurveRange(0, 0, 1, 1)]
         private AnimationCurve m_galaxySpeed = DefaultResources.SpeedCurve;
         #endregion
@@ -30,12 +34,23 @@ namespace Galaxia
         internal Shader shader;
         #endregion
 
+        /// <summary>
+        /// Gets a <see name="Particle Prefab" cref="T:Galaxia.ParticlesPrefab"/>
+        /// </summary>
+        /// <example>
+        /// <code>
+        /// GalaxyPrefab galaxy;
+        /// galaxy[0].Size = 0.2;
+        /// </code>
+        /// </example>
+        /// <param name="index"></param>
+        /// <returns>A <see name="Galaxy Prefab" cref="T:Galaxia.ParticlesPrefab"/> at index</returns>
         public ParticlesPrefab this[int index]
         {
             get { return m_particlePrefabs[index]; }
         }
 
-        public void OnEnable()
+        private void OnEnable()
         {
             if (m_particlePrefabs == null)
                 m_particlePrefabs = new List<ParticlesPrefab>();
@@ -43,6 +58,7 @@ namespace Galaxia
             if (shader == null)
                 shader = Resources.Load<Shader>("Shaders/ParticleBillboard");
         }
+
         public IEnumerator<ParticlesPrefab> GetEnumerator()
         {
             return m_particlePrefabs.GetEnumerator();
@@ -53,6 +69,11 @@ namespace Galaxia
             return m_particlePrefabs.GetEnumerator();
         }
 
+        /// <summary>
+        /// Populates a <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> with ready set Presets.
+        /// </summary>
+        /// <param name="prefab" type="T:Galaxia.ParticlesPrefab">The Prefab to populate</param>
+        /// <param name="Preset"> The preset to use</param>
         public void PopulatePreset(ParticlesPrefab prefab,ParticlesPrefab.Preset Preset)
         {
             switch(Preset)
@@ -82,6 +103,10 @@ namespace Galaxia
             prefab.OriginalPreset = Preset;
         }
 
+        /// <summary>
+        /// Adds a <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> to the Galaxy
+        /// </summary>
+        /// <param name="item">The particle prefab</param>
         public void Add(ParticlesPrefab item)
         {
             item.SetUp(this);
@@ -91,16 +116,20 @@ namespace Galaxia
             item.Material = new Material(shader);
             item.Material.hideFlags = HideFlags.HideInHierarchy | HideFlags.NotEditable;
             m_particlePrefabs.Add(item);
+            RecreateAllGalaxies();
         }
 
+        /// <summary>
+        /// Creates and adds a <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> from a given preset
+        /// </summary>
+        /// <param name="name">Name of the new Particles Prefab</param>
+        /// <param name="Preset"></param>
+        /// <returns>The created and populated Particles Prefab</returns>
         public ParticlesPrefab Create(string name,ParticlesPrefab.Preset Preset)
         {
             ParticlesPrefab prefab = CreateInstance<ParticlesPrefab>();
             
             prefab.name = name;
-            //prefab.Material = new Material(shader);
-            //prefab.Material.name = name + "_material";
-            //prefab.Material.hideFlags = HideFlags.None;
             PopulatePreset(prefab, Preset);
             Add(prefab);
             #if HIDE_SUB_ASSETS
@@ -108,7 +137,11 @@ namespace Galaxia
             #endif
             return prefab;
         }
-
+        /// <summary>
+        /// Insert a <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> afer an other
+        /// </summary>
+        /// <param name="after" type="T:Galaxia.ParticlesPrefab">The prefab to insert after</param>
+        /// <param name="toInsert" type="T:Galaxia.ParticlesPrefab">The Prefab to Insert</param>
         public void Insert(ParticlesPrefab after,ParticlesPrefab toInsert)
         {
             int index = 0;
@@ -121,22 +154,37 @@ namespace Galaxia
             #endif
             }
         }
-
+        /// <summary>
+        /// Clears all the Particle Prefabs
+        /// Note that this does not Destory the Prefabs
+        /// </summary>
         public void Clear()
         {
             m_particlePrefabs.Clear();
         }
 
+        /// <summary>
+        /// Check if a <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> exists in the galaxy
+        /// </summary>
+        /// <param name="item">The Prefab to search for</param>
+        /// <returns>Is the Prefab present in the galaxy</returns>
         public bool Contains(ParticlesPrefab item)
         {
             return m_particlePrefabs.Contains(item);
         }
 
+        /// <summary>
+        /// Copies all the <see name="Particle Prefabs" cref="T:Galaxia.ParticlesPrefab"/> to another array
+        /// </summary>
+        /// <param name="array">The array used to copy tp</param>
+        /// <param name="arrayIndex">The index to start at</param>
         public void CopyTo(ParticlesPrefab[] array, int arrayIndex)
         {
             m_particlePrefabs.CopyTo(array,arrayIndex);
         }
-
+        /// <summary>
+        /// The number of <see name="Particle Prefabs" cref="T:Galaxia.ParticlesPrefab"/> in the Galaxy
+        /// </summary>
         public int Count
         {
             get { return m_particlePrefabs.Count; }
@@ -146,49 +194,109 @@ namespace Galaxia
         {
             get { return false; }
         }
-
+        /// <summary>
+        /// Removes a given <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> from the galaxy.
+        /// If a Prefab does not exist in the galaxy it will return false
+        /// </summary>
+        /// <param name="item">The Prefab to remove</param>
+        /// <returns>Is a Prefab successfuly removed</returns>
         public bool Remove(ParticlesPrefab item)
         {
             return m_particlePrefabs.Remove(item);
         }
-
+        /// <summary>
+        /// Updates all <see name="Galaxies" cref="T:Galaxia.Galaxy"/> that use the Galaxy Prefab
+        /// If a Galaxy is set to a Manual update, it will not be Updated.
+        /// This calls the <see name="UpdateParticles()" cref="M:Galaxia.UpdateParticles"/> method
+        /// </summary>
         public void UpdateAllGalaxies()
         {
             foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
             {
-                if (galaxy.GalaxyPrefab == this)
+                if (galaxy.GalaxyPrefab == this && galaxy.GenerationType == Galaxy.GalaxyGenerationType.Automatic)
                 {
                     galaxy.UpdateParticles();
                 }
             }
         }
-
+        /// <summary>
+        /// Updates all the <see name="Particles" cref="T:Galaxia.Particles"/> with a given <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/>
+        /// in all the Galaxies using the Galaxy prefab
+        /// Note that this updated the existing particles and does not Destory them
+        /// </summary>
+        /// <param name="prefab"></param>
         public void UpdateAllGalaxies(ParticlesPrefab prefab)
         {
             foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
             {
-                if (galaxy.GalaxyPrefab == this)
+                if (galaxy.GalaxyPrefab == this && galaxy.GenerationType == Galaxy.GalaxyGenerationType.Automatic)
                 {
                     galaxy.UpdateParticles(prefab);
                 }
             }
         }
 
+        /// <summary>
+        /// Recreates the <see name="Particles" cref="T:Galaxia.Particles"/> of all <see name="Galaxies" cref="T:Galaxia.Galaxy"/> with the Galaxy Prefab
+        /// Note that this fully Destroys previous <see name="Particles" cref="T:Galaxia.Particles"/> and Creates new ones.
+        /// </summary>
         public void RecreateAllGalaxies()
         {
-            foreach (Galaxy g in GameObject.FindObjectsOfType<Galaxy>())
+            foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
             {
-                if (g.GalaxyPrefab == this)
+                if (galaxy.GalaxyPrefab == this && galaxy.GenerationType == Galaxy.GalaxyGenerationType.Automatic)
                 {
-                    g.GenerateParticles();
+                    galaxy.GenerateParticles();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Recreates the <see name="Particles" cref="T:Galaxia.Particles"/> with a given <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> of all <see name="Galaxies" cref="T:Galaxia.Galaxy"/> with the Galaxy Prefab
+        /// Note that this fully Destroys previous <see name="Particles" cref="T:Galaxia.Particles"/> and Creates new ones.
+        /// </summary>
+        public void RecreateAllGalaxies(ParticlesPrefab prefab)
+        {
+            foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
+            {
+                if (galaxy.GalaxyPrefab == this && galaxy.GenerationType == Galaxy.GalaxyGenerationType.Automatic)
+                {
+                    galaxy.GenerateParticles(prefab);
                 }
             }
         }
 
         #region Setters and Getters
-        public float Size { get { return m_size; } set { m_size = value; } }
-        public float HeightOffset { get { return m_heightOffset; } set { m_heightOffset = value; } }
-        public AnimationCurve GalaxySpeed { get { return m_galaxySpeed; } set { m_galaxySpeed = value; } }
+        /// <summary>
+        /// Size of the Galaxy
+        /// </summary>
+        public float Size
+        {
+            get { return m_size; }
+            set
+            {
+                m_size = value;
+                UpdateAllGalaxies();
+            }
+        }
+
+        /// <summary>
+        /// Height Offset of the galaxy particles
+        /// This includes the range from -Offset ot +Offset from the position the Galaxy is in
+        /// </summary>
+        public float HeightOffset
+        {
+            get { return m_heightOffset; }
+            set
+            {
+                m_heightOffset = value;
+                UpdateAllGalaxies();
+            }
+        }
+        /// <summary>
+        /// The Active Distributor
+        /// Here are the algoriths for Position, color, size and rotation distribution of the particles
+        /// </summary>
         public ParticleDistributor Distributor
         {
             get { return m_distributor; }
@@ -198,6 +306,7 @@ namespace Galaxia
                 #if HIDE_SUB_ASSETS
                 m_distributor.hideFlags = HideFlags.HideInHierarchy;
                 #endif
+                RecreateAllGalaxies();
             }
         }
         #endregion
