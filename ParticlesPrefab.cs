@@ -133,12 +133,16 @@ namespace Galaxia
             return Random.Next() * Mathf.PI * 2;
         }
 
+        public void UpdateMaterial()
+        {
+            UpdateMaterial(GalaxyPrefab);
+        }
+
         public void UpdateMaterial(GalaxyPrefab prefab)
         {
             if (m_material == null)
             {
-                m_material = new Material(prefab.shader);
-                m_material.hideFlags = HideFlags.DontSave;
+                CreateMaterial(prefab, false);
             }
 
             if (prefab != null && m_material != null)
@@ -151,6 +155,27 @@ namespace Galaxia
                 m_material.SetInt("MyDstMode", (int)m_blendModeDis);
                 m_material.renderQueue = m_renderQueue;
             }
+        }
+
+        internal void CreateMaterial(GalaxyPrefab prefab,bool GPU)
+        {
+            if (m_material != null)
+                DestroyImmediate(m_material,true);
+
+            Shader s = prefab.shaderBruteForce;
+
+            if (Galaxy.SupportsDirectX11)
+            {
+                s = prefab.shader;
+            }
+            else if (Galaxy.OpenGL)
+            {
+                s = prefab.shaderBruteForceGLSL;
+            }
+                
+
+            m_material = new Material(s);
+            m_material.hideFlags = HideFlags.DontSave;
         }
 
         public void UpdateMaterialAnimation(GalaxyPrefab prefab,float speed,bool Animate)

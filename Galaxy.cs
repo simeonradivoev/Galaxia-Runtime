@@ -1,5 +1,6 @@
 ﻿#define HIDE_SUB_ASSETS
 #define EDIT_RESOURCES
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
@@ -22,7 +23,7 @@ namespace Galaxia
         [SerializeField]
         private GalaxyGenerationType m_generationType;
         [SerializeField]
-        private bool m_directx11 = true;
+        private bool m_gpu = true;
         [SerializeField]
         private GalaxyPrefab m_galaxy;
         #endregion
@@ -60,8 +61,9 @@ namespace Galaxia
                         #endif
                         obj.transform.parent = transform;
                         Particles p = obj.GetComponent<Particles>();
-                        p.Generate(prefab, GalaxyPrefab,DirectX11);
+                        p.Generate(prefab, GalaxyPrefab, GPU);
                         particles.Add(p);
+                        prefab.CreateMaterial(GalaxyPrefab,GPU);
                         prefab.UpdateMaterial(GalaxyPrefab);
                     }
                 }
@@ -87,8 +89,9 @@ namespace Galaxia
                     #endif
                     obj.transform.parent = transform;
                     Particles p = obj.GetComponent<Particles>();
-                    p.Generate(prefab, GalaxyPrefab, DirectX11);
+                    p.Generate(prefab, GalaxyPrefab, GPU);
                     particles.Add(p);
+                    prefab.CreateMaterial(GalaxyPrefab, GPU);
                     prefab.UpdateMaterial(GalaxyPrefab);
                 }
                 else
@@ -105,7 +108,7 @@ namespace Galaxia
         /// </summary>
         public void DestroyParticles()
         {
-            Debug.Log("Particles Cleared");
+            //Debug.Log("Particles Cleared");
 
             if (particles != null)
             {
@@ -154,7 +157,7 @@ namespace Galaxia
         /// </summary>
         public void UpdateParticles()
         {
-            Debug.Log("Updating particles");
+            //Debug.Log("Updating particles");
 
             if(GalaxyPrefab != null)
             {
@@ -171,7 +174,7 @@ namespace Galaxia
         }
         void ForceUpdateParticles()
         {
-            Debug.Log("Updating particles");
+            //Debug.Log("Updating particles");
 
             if (GalaxyPrefab != null)
             {
@@ -182,6 +185,7 @@ namespace Galaxia
             {
                 if (GalaxyPrefab != null)
                 {
+                    //particle.Prefab.CreateMaterial(GalaxyPrefab,DirectX11);
                     particle.UpdateParticles();
                 }
             }
@@ -236,7 +240,7 @@ namespace Galaxia
         /// </summary>
         public void DrawNow()
         {
-            if (GalaxyPrefab != null && DirectX11)
+            if (GalaxyPrefab != null && GPU)
             {
                 foreach (Particles particle in particles)
                 {
@@ -255,7 +259,7 @@ namespace Galaxia
         /// </summary>
         public void Draw()
         {
-            if (GalaxyPrefab != null && DirectX11)
+            if (GalaxyPrefab != null && GPU)
             {
                 foreach (Particles particle in particles)
                 {
@@ -304,19 +308,44 @@ namespace Galaxia
         /// Returns if DirectX 11 is supported on the software.
         /// If it is avalible you can disable it from here.
         /// </summary>
+        [Obsolete("New Function is GPU")]
         public bool DirectX11
         {
-            get { return m_directx11 && SystemInfo.graphicsShaderLevel >= 40; }
+            get { return GPU; }
             set
             {
-                if (m_directx11 != value)
+                GPU = value;
+            }
+        }
+
+        /// <summary>
+        /// Will use Custom particles, rendered on the GPU
+        /// if not, it will use the Unity Particle System
+        /// </summary>
+        public bool GPU
+        {
+            get { return m_gpu; }
+            set
+            {
+                if (m_gpu != value)
                 {
-                    m_directx11 = value;
+                    m_gpu = value;
                     if (m_generationType == GalaxyGenerationType.Automatic)
                         GenerateParticles();
                 }
             }
         }
+
+        public static bool OpenGL
+        {
+            get { return SystemInfo.graphicsDeviceVersion.Contains("OpenGL"); }
+        }
+
+        public static bool SupportsDirectX11
+        {
+            get { return !OpenGL && SystemInfo.graphicsShaderLevel >= 40; }
+        }
+
         #endregion
         #region enums
         public enum GalaxyGenerationType

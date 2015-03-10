@@ -32,6 +32,12 @@ namespace Galaxia
         [SerializeField]
         [HideInInspector]
         internal Shader shader;
+        [SerializeField]
+        [HideInInspector]
+        internal Shader shaderBruteForce;
+        [SerializeField]
+        [HideInInspector]
+        internal Shader shaderBruteForceGLSL;
         #endregion
 
         /// <summary>
@@ -57,6 +63,12 @@ namespace Galaxia
 
             if (shader == null)
                 shader = Resources.Load<Shader>("Shaders/ParticleBillboard");
+
+            if(shaderBruteForce == null)
+                shaderBruteForce = Resources.Load<Shader>("Shaders/ParticleBillboardBruteForce");
+
+            if (shaderBruteForceGLSL == null)
+                shaderBruteForceGLSL = Resources.Load<Shader>("Shaders/ParticleBillboardBruteForceGLSL");
         }
 
         public IEnumerator<ParticlesPrefab> GetEnumerator()

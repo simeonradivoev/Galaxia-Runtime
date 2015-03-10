@@ -58,7 +58,7 @@ namespace Galaxia
                 integral.AddKey(frames[i].time, frames[i].value * normalizer);
             }
 
-            Debug.Log(normalizer);
+            //Debug.Log(normalizer);
             return integral;
         }
 
@@ -83,7 +83,7 @@ namespace Galaxia
         public static AnimationCurve Inverse(AnimationCurve curve)
         {
             AnimationCurve inverse = new AnimationCurve();
-            Debug.Log(curve.keys.Length);
+            //Debug.Log(curve.keys.Length);
             for (int i = 0; i < curve.keys.Length; i++)
             {
                 inverse.AddKey(curve.keys[i].value, curve.keys[i].time);

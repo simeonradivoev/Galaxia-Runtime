@@ -11,7 +11,7 @@ namespace Galaxia
     public sealed class Particles : MonoBehaviour
     {
         #region Constants
-        public const int MAX_VERTEX_PER_MESH = 65000;
+        public const int MAX_VERTEX_PER_MESH = 40000;
         #endregion
         #region Private
         [SerializeField]
@@ -50,20 +50,23 @@ namespace Galaxia
 
         void LateUpdate()
         {
-            if(m_needsRebuild)
+            if(m_needsUpdate || m_needsRebuild)
             {
-                if (m_prefab != null && m_galaxyPrefab != null)
+                if(m_needsRebuild)
                 {
+                    Prefab.UpdateMaterial();
                     Build();
+                    m_needsRebuild = false;
                 }
-            }
+                else if(m_needsUpdate)
+                {
+                    m_needsUpdate = false;
+                }
 
-            if(m_needsUpdate)
-            {
                 UpdateParticles();
             }
 
-            if (GalaxyPrefab != null && Galaxy != null && Galaxy.DirectX11)
+            if (GalaxyPrefab != null && Galaxy != null)
             {
                 Draw();
             }
@@ -74,44 +77,14 @@ namespace Galaxia
         /// Rebuilds the renderers with the generated mesh
         /// if the system doesn not support geometry shaders it will build it with unity's particle system
         /// </summary>
-        /// <param name="galaxy">The galaxy prefab</param>
-        /// <param name="directx11">if you want to render in directx 11 or not</param>
         internal void Build()
         {
             if (m_prefab != null && m_prefab.active && Galaxy != null)
             {
-                //only do geometry shader particles on direct x 10 and above
-                if (Galaxy.DirectX11)
-                {
-                    //if (m_meshes != null)
-                    //{
-                    //    DestroyRenderers();
-                    //    m_renderers = new GameObject[m_meshes.Length];
-                    //    m_prefab.UpdateMaterial(m_galaxyPrefab);
-
-                    //    for (int i = 0; i < m_meshes.Length; i++)
-                    //    {
-                    //        GameObject g = new GameObject("Renderer", typeof(MeshRenderer), typeof(MeshFilter));
-                    //        #if HIDE_SUB_ASSETS
-                    //        g.hideFlags = HideFlags.HideInHierarchy;
-                    //        #endif
-                    //        //g.hideFlags |= HideFlags.DontSave;
-                    //        g.transform.parent = transform;
-                    //        g.GetComponent<MeshFilter>().sharedMesh = m_meshes[i];
-                    //        g.renderer.sharedMaterial = m_prefab.Material;
-                    //        g.renderer.castShadows = false;
-                    //        g.renderer.receiveShadows = false;
-
-                    //        m_renderers[i] = g;
-                    //    }
-
-                        
-                    //}
-                }
-                else
+                if (!Galaxy.GPU)
                 {
                     m_renderers = new GameObject[1];
-                    GameObject g = new GameObject("Shuriken Renderer",typeof(ParticleSystem));
+                    GameObject g = new GameObject("Shuriken Renderer", typeof(ParticleSystem));
                     g.transform.parent = transform;
                     ParticleSystem system = g.GetComponent<ParticleSystem>();
                     system.maxParticles = m_prefab.Count;
@@ -124,8 +97,6 @@ namespace Galaxia
                     system.Stop();
                     m_renderers[0] = g;
                 }
-
-                m_needsRebuild = false;
             }
         }
 
@@ -133,25 +104,13 @@ namespace Galaxia
         {
             if (m_prefab != null)
             {
-                if (m_meshes != null && m_meshes.Length == MeshCount(m_prefab.Count))
-                {
-                    UpdateRenderer();
-                    UpdateParticleList();
+                UpdateRenderer();
+                UpdateParticleList();
 
-                    if (Galaxy.DirectX11)
-                    {
-                        UpdateMeshes();
-                    }
-                    else
-                    {
-                        UpdateShuriken();
-                    }
-                    
-                }
+                if(m_gpu)
+                    UpdateMeshes();
                 else
-                {
-                    Generate(m_prefab, m_galaxyPrefab,m_gpu);
-                }
+                    UpdateShuriken();
 
                 m_needsUpdate = false;
             }
@@ -161,36 +120,24 @@ namespace Galaxia
             }
         }
 
-        internal void UpdateParticles_MT(object galaxyObj)
-        {
-            GalaxyPrefab galaxy = galaxyObj as GalaxyPrefab;
-
-            if (m_meshes != null && m_meshes.Length == MeshCount(m_prefab.Count))
-            {
-                UpdateParticleList();
-                UpdateMeshes();
-            }
-            else
-            {
-                //Generate(Prefab, galaxy);
-            }
-        }
-
         public void DrawNow()
         {
-            foreach(Mesh m in m_meshes)
+            if (m_gpu)
             {
-                if (m == null || m_meshes == null)
+                foreach (Mesh m in m_meshes)
                 {
-                    UpdateMeshes();
-                }
-
-                if (m != null && m_prefab.active && m_prefab.Material != null)
-                {
-                    if (m_prefab.Material.SetPass(0))
+                    if (m == null || m_meshes == null)
                     {
-                        m_prefab.UpdateMaterial(m_galaxyPrefab);
-                        Graphics.DrawMeshNow(m, transform.parent.localToWorldMatrix);
+                        UpdateMeshes();
+                    }
+
+                    if (m != null && m_prefab.active && m_prefab.Material != null)
+                    {
+                        if (m_prefab.Material.SetPass(0))
+                        {
+                            m_prefab.UpdateMaterial(m_galaxyPrefab);
+                            Graphics.DrawMeshNow(m, transform.parent.localToWorldMatrix);
+                        }
                     }
                 }
             }
@@ -198,16 +145,24 @@ namespace Galaxia
 
         public void Draw()
         {
-            foreach (Mesh m in m_meshes)
+            if (m_gpu)
             {
-                if (m == null || m_meshes == null)
+                foreach (Mesh m in m_meshes)
                 {
-                    UpdateMeshes();
-                }
+                    if (m == null || m_meshes == null)
+                    {
+                        UpdateMeshes();
+                    }
 
-                if (m != null && m_prefab.active)
-                {
-                    Graphics.DrawMesh(m, transform.localToWorldMatrix, m_prefab.Material, 0);
+                    if (m != null && m_prefab.active)
+                    {
+                        //if(Galaxy.DirectX11)
+                        //    Prefab.Material.shader = GalaxyPrefab.shader;
+                        //else
+                        //    Prefab.Material.shader = GalaxyPrefab.shaderCPU;
+
+                        Graphics.DrawMesh(m, transform.localToWorldMatrix, m_prefab.Material, 0);
+                    }
                 }
             }
         }
@@ -217,39 +172,33 @@ namespace Galaxia
             return Mathf.FloorToInt((float)Count / (float)MAX_VERTEX_PER_MESH) + 1;
         }
 
+        int MeshCountCPU(int Count)
+        {
+            return Mathf.FloorToInt((float)(Count * 4) / (float)MAX_VERTEX_PER_MESH) + 1;
+        }
+
         /// <summary>
         /// Updates the generated meshes with the information from the particle data list
         /// </summary>
         /// <param name="galaxy">The galaxy prefab</param>
         void UpdateMeshes()
         {
-            if (m_meshes == null)
-            {
-                m_meshes = new Mesh[0];
-            }
+            if (Galaxy.SupportsDirectX11)
+                UpdateMeshesNormal();
+            else
+                UpdateMeshesBruteForce();
+        }
 
-            if (m_meshes.Length != MeshCount(m_prefab.Count))
-            {
-                System.Array.Resize<Mesh>(ref m_meshes, MeshCount(m_prefab.Count));
-            }
+        void UpdateMeshesNormal()
+        {
+            int meshCount = MeshCount(m_prefab.Count);
+            UpdateMeshesBase(meshCount);
 
             Random.seed = m_prefab.Seed;
 
             for (int i = 0; i < m_meshes.Length; i++)
             {
-                int size = MAX_VERTEX_PER_MESH;
-                if (i == m_meshes.Length - 1)
-                    size = m_prefab.Count - MAX_VERTEX_PER_MESH * i;
-
-                if (m_meshes[i] == null)
-                {
-                    m_meshes[i] = new Mesh();
-                    m_meshes[i].hideFlags = HideFlags.HideAndDontSave;
-                }
-                else if (m_meshes[i].vertexCount > size)
-                {
-                    m_meshes[i].Clear(true);
-                }
+                int size = UpdateMeshBase(i, meshCount, m_prefab.Count);
 
                 Vector3[] vertex = new Vector3[size];
                 Color[] color = new Color[size];
@@ -259,10 +208,11 @@ namespace Galaxia
 
                 for (int e = 0; e < size; e++)
                 {
-                    vertex[e] = m_particleList[i * MAX_VERTEX_PER_MESH + e].position;
-                    color[e] = m_particleList[i * MAX_VERTEX_PER_MESH + e].color;
-                    info[e].x = m_particleList[i * MAX_VERTEX_PER_MESH + e].size;
-                    info[e].y = m_particleList[i * MAX_VERTEX_PER_MESH + e].rotation;
+                    int particleIndex = i * MAX_VERTEX_PER_MESH + e;
+                    vertex[e] = m_particleList[particleIndex].position;
+                    color[e] = m_particleList[particleIndex].color;
+                    info[e].x = m_particleList[particleIndex].size;
+                    info[e].y = m_particleList[particleIndex].rotation;
                     sheetPos[e].x = Random.Next(0, (int)Mathf.Pow(Prefab.TextureSheetPow, 2));
                     indexes[e] = e;
                 }
@@ -273,9 +223,86 @@ namespace Galaxia
                 m_meshes[i].uv1 = sheetPos;
                 m_meshes[i].SetIndices(indexes, MeshTopology.Points, 0);
                 m_meshes[i].RecalculateBounds();
-
-
             }
+        }
+
+        void UpdateMeshesBruteForce()
+        {
+            int meshCount = MeshCountCPU(m_prefab.Count);
+            UpdateMeshesBase(meshCount);
+
+            Random.seed = m_prefab.Seed;
+
+            for (int i = 0; i < meshCount; i++)
+            {
+                int size = UpdateMeshBase(i,meshCount,m_prefab.Count * 4);
+                Vector3[] vertex = new Vector3[size];
+                Color[] color = new Color[size];
+                Vector2[] info = new Vector2[size];
+                Vector2[] sheetPos = new Vector2[size];
+                Vector3[] normals = new Vector3[size];
+                int[] indexes = new int[size];
+
+                for (int e = 0; e < size; e++)
+                {
+                    int particleIndex = Mathf.FloorToInt((i * MAX_VERTEX_PER_MESH + e) / 4f);
+                    vertex[e] = m_particleList[particleIndex].position;
+                    color[e] = m_particleList[particleIndex].color;
+                    info[e].x = m_particleList[particleIndex].size;
+                    info[e].y = m_particleList[particleIndex].rotation;
+                    sheetPos[e].x = Random.Next(0, (int)Mathf.Pow(Prefab.TextureSheetPow, 2));
+                    indexes[e] = e;
+                }
+
+                for (int e = 0; e < size; e+=4)
+                {
+                    int particleIndex = Mathf.FloorToInt((i * MAX_VERTEX_PER_MESH + e) / 4f);
+                    normals[e] = new Vector3(-1,-1);
+                    normals[e+1] = new Vector3(-1, 1);
+                    normals[e+2] = new Vector3(1, 1);
+                    normals[e+3] = new Vector3(1, -1);
+                }
+
+                m_meshes[i].vertices = vertex;
+                m_meshes[i].colors = color;
+                m_meshes[i].uv = info;
+                m_meshes[i].uv1 = sheetPos;
+                m_meshes[i].normals = normals;
+                m_meshes[i].SetIndices(indexes, MeshTopology.Quads, 0);
+                m_meshes[i].RecalculateBounds();
+            }
+        }
+
+        void UpdateMeshesBase(int MeshCount)
+        {
+            if (m_meshes == null)
+            {
+                m_meshes = new Mesh[0];
+            }
+
+            if(MeshCount != m_meshes.Length)
+            {
+                System.Array.Resize<Mesh>(ref m_meshes,MeshCount);
+            }
+        }
+
+        int UpdateMeshBase(int MeshIndex,int MeshCount,int ParicleCount)
+        {
+            int size = MAX_VERTEX_PER_MESH;
+            if (MeshIndex == MeshCount - 1)
+                size = ParicleCount - MAX_VERTEX_PER_MESH * MeshIndex;
+
+            if (m_meshes[MeshIndex] == null)
+            {
+                m_meshes[MeshIndex] = new Mesh();
+                m_meshes[MeshIndex].hideFlags = HideFlags.HideAndDontSave;
+            }
+            else if (m_meshes[MeshIndex].vertexCount > size)
+            {
+                m_meshes[MeshIndex].Clear(true);
+            }
+
+            return size;
         }
 
         void UpdateShuriken()
@@ -325,6 +352,7 @@ namespace Galaxia
                 for (int i = 0; i < m_prefab.Count; i++)
                 {
                     m_particleList[i] = new Particle();
+                    m_particleList[i].index = i;
                     m_galaxyPrefab.Distributor.Process(new ParticleDistributor.ProcessContext(m_particleList[i], m_galaxyPrefab, m_prefab, 0, i));
                 }
             }

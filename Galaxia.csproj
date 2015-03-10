@@ -84,7 +84,7 @@
 
 echo f|xcopy "$(TargetDir)$(TargetName).pdb" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\Galaxia\Scripts"/Y
 
-echo f|xcopy "$(TargetDir)$(TargetName).XML" "\\SIMEON-SERVER\www\Documentation\Galaxia"/Y
+
 
 "D:\Program Files (x86)\Unity\Editor\Data\Mono\lib\mono\2.0\pdb2mdb.exe" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\Galaxia\Scripts\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
