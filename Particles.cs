@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Linq;
+using UnityEngine.Rendering;
 
 namespace Galaxia
 {
@@ -89,10 +90,11 @@ namespace Galaxia
                     ParticleSystem system = g.GetComponent<ParticleSystem>();
                     system.maxParticles = m_prefab.Count;
                     system.playOnAwake = false;
-                    system.renderer.material = Resources.Load<Material>("Materials/ParticleSystemParticle");
-                    system.renderer.material.mainTexture = m_prefab.Texture;
-                    system.renderer.castShadows = false;
-                    system.renderer.receiveShadows = false;
+                    Renderer renderer = system.GetComponent<Renderer>();
+                    renderer.material = Resources.Load<Material>("Materials/ParticleSystemParticle");
+                    renderer.material.mainTexture = m_prefab.Texture;
+                    renderer.shadowCastingMode = ShadowCastingMode.On;
+                    renderer.receiveShadows = false;
                     system.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
                     system.Stop();
                     m_renderers[0] = g;
@@ -147,9 +149,12 @@ namespace Galaxia
         {
             if (m_gpu)
             {
+                if (m_meshes == null)
+                    UpdateMeshes();
+
                 foreach (Mesh m in m_meshes)
                 {
-                    if (m == null || m_meshes == null)
+                    if (m == null)
                     {
                         UpdateMeshes();
                     }
@@ -220,7 +225,7 @@ namespace Galaxia
                 m_meshes[i].vertices = vertex;
                 m_meshes[i].colors = color;
                 m_meshes[i].uv = info;
-                m_meshes[i].uv1 = sheetPos;
+                m_meshes[i].uv2 = sheetPos;
                 m_meshes[i].SetIndices(indexes, MeshTopology.Points, 0);
                 m_meshes[i].RecalculateBounds();
             }
@@ -266,7 +271,7 @@ namespace Galaxia
                 m_meshes[i].vertices = vertex;
                 m_meshes[i].colors = color;
                 m_meshes[i].uv = info;
-                m_meshes[i].uv1 = sheetPos;
+                m_meshes[i].uv2 = sheetPos;
                 m_meshes[i].normals = normals;
                 m_meshes[i].SetIndices(indexes, MeshTopology.Quads, 0);
                 m_meshes[i].RecalculateBounds();
@@ -309,9 +314,10 @@ namespace Galaxia
         {
             foreach(GameObject g in Renderers)
             {
-                if(g.particleSystem != null)
+                ParticleSystem system = g.GetComponent<ParticleSystem>();
+                if (system != null)
                 {
-                    g.particleSystem.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
+                    system.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
                 }
             }
         }
@@ -324,7 +330,11 @@ namespace Galaxia
             {
                 foreach (GameObject g in Renderers)
                 {
-                    g.renderer.enabled = Prefab.active;
+                    Renderer renderer = g.GetComponent<Renderer>();
+                    if(renderer != null)
+                    {
+                        renderer.enabled = Prefab.active;
+                    }
                 }
             }
         }
