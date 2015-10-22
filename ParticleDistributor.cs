@@ -11,6 +11,12 @@ namespace Galaxia
         #region Private
         #endregion
         #region Abstract methods
+        /// <summary>
+        /// Used by the Particle Generator to modify/distribute the particles to a desired shape.
+        /// This is where particles are procceded one by one.
+        /// <see cref="Galaxia.ParticleDistributor.ProcessContext"/>
+        /// </summary>
+        /// <param name="context">The context holds information on the current particle and Galaxy Object.</param>
         public abstract void Process(ProcessContext context);
         protected virtual void ProcessProperties(ProcessContext context,Vector3 pos,float angle)
         {
@@ -27,6 +33,13 @@ namespace Galaxia
         public virtual void RecreateCurves() { }
         #endregion
         #region static methods
+        /// <summary>
+        /// Used to calculated the Integral Curve of the given Animation curve.
+        /// Used by the distribution function for <see cref="Galaxia.Image"/>
+        /// </summary>
+        /// <param name="curve">The animation curve.</param>
+        /// <param name="steps">The resolution/quality of the integral sampling. A grater value means more detail but slower speed.</param>
+        /// <returns>The integrated Curve.</returns>
         public static AnimationCurve Integral(AnimationCurve curve, int steps)
         {
             Keyframe[] frames = new Keyframe[steps];
@@ -80,6 +93,12 @@ namespace Galaxia
             }
         }
 
+        /// <summary>
+        /// Used to inverse an Animation curve.
+        /// This swaps the time and value of all the keys in the animation curve.
+        /// </summary>
+        /// <param name="curve">The animation curve to invert.</param>
+        /// <returns>The inverted version of the given animation curve.</returns>
         public static AnimationCurve Inverse(AnimationCurve curve)
         {
             AnimationCurve inverse = new AnimationCurve();
