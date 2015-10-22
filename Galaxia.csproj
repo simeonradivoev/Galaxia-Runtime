@@ -54,6 +54,7 @@
     <Compile Include="Galaxy.cs" />
     <Compile Include="GalaxyPrefab.cs" />
     <Compile Include="GaussianDistributor.cs" />
+    <Compile Include="ImageDistributor.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleDistributor.cs" />
     <Compile Include="Particles.cs" />
@@ -86,7 +87,7 @@ echo f|xcopy "$(TargetDir)$(TargetName).pdb" "D:\My Documents\My Pictures\My Art
 
 
 
-"D:\Program Files (x86)\Unity\Editor\Data\Mono\lib\mono\2.0\pdb2mdb.exe" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\Galaxia\Scripts\$(TargetFileName)"</PostBuildEvent>
+"D:\Program Files\Unity\Editor\Data\Mono\lib\mono\2.0\pdb2mdb.exe" "D:\My Documents\My Pictures\My Art\Games\Galaxy Generator\Assets\Galaxia\Scripts\$(TargetFileName)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
