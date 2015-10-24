@@ -1,9 +1,7 @@
 ﻿#define HIDE_SUB_ASSETS
 #define EDIT_RESOURCES
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 

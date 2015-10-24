@@ -1,8 +1,5 @@
 ﻿//#define HIDE_SUB_ASSETS
 using UnityEngine;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
 using System.Linq;
 using UnityEngine.Rendering;
 
