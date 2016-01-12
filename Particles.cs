@@ -63,10 +63,13 @@ namespace Galaxia
 
                 UpdateParticles();
             }
+        }
 
+        void OnRenderObject()
+        {
             if (GalaxyPrefab != null && Galaxy != null)
             {
-                Draw();
+                DrawNow();
             }
         }
 
@@ -163,7 +166,7 @@ namespace Galaxia
                         //else
                         //    Prefab.Material.shader = GalaxyPrefab.shaderCPU;
 
-                        Graphics.DrawMesh(m, transform.localToWorldMatrix, m_prefab.Material, 0);
+                        Graphics.DrawMesh(m, transform.localToWorldMatrix, m_prefab.Material, 8);
                     }
                 }
             }
