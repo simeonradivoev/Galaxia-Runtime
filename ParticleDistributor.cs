@@ -2,9 +2,16 @@
 
 namespace Galaxia
 {
+    /// <summary>
+    /// The Particle Distributor is the base class for all Particle Distributors.
+    /// As it's name suggests, it is used to control the distribution of generated particles.
+    /// </summary>
     public abstract class ParticleDistributor : ScriptableObject
     {
         #region constants
+        /// <summary>
+        /// The Gravitational constant
+        /// </summary>
         public const float G = 6.67384f;
         #endregion
         #region Private
@@ -12,29 +19,42 @@ namespace Galaxia
         #region Abstract methods
         /// <summary>
         /// Used by the Particle Generator to modify/distribute the particles to a desired shape.
-        /// This is where particles are procceded one by one.
+        /// This is where particles are processed one by one.
         /// <see cref="Galaxia.ParticleDistributor.ProcessContext"/>
         /// </summary>
         /// <param name="context">The context holds information on the current particle and Galaxy Object.</param>
         public abstract void Process(ProcessContext context);
+        /// <summary>
+        /// Used to process any additional properties dependant on the position and angle of a particle
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="pos"></param>
+        /// <param name="angle"></param>
         protected virtual void ProcessProperties(ProcessContext context,Vector3 pos,float angle)
         {
             context.particle.color = context.particles.GetColor(pos, pos.magnitude, context.galaxy.Size, angle, context.particle.index);
             context.particle.size = context.particles.GetSize(pos, pos.magnitude, context.galaxy.Size, angle, context.particle.index);
             context.particle.rotation = context.particles.GetRotation(pos, pos.magnitude, context.galaxy.Size, angle, context.particle.index);
         }
+        /// <summary>
+        /// Updates all uniform variables in the given material
+        /// </summary>
+        /// <param name="material">the given material</param>
         public virtual void UpdateMaterial(Material material)
         {
 
         }
         #endregion
         #region Virtual Methods
+        /// <summary>
+        /// Used for recreating any predefined curves.
+        /// </summary>
         public virtual void RecreateCurves() { }
         #endregion
         #region static methods
         /// <summary>
         /// Used to calculated the Integral Curve of the given Animation curve.
-        /// Used by the distribution function for <see cref="Galaxia.Image"/>
+        /// Used by the distribution function for <see cref="Galaxia.ImageDistributor"/>
         /// </summary>
         /// <param name="curve">The animation curve.</param>
         /// <param name="steps">The resolution/quality of the integral sampling. A grater value means more detail but slower speed.</param>
@@ -70,18 +90,46 @@ namespace Galaxia
                 integral.AddKey(frames[i].time, frames[i].value * normalizer);
             }
 
-            //Debug.Log(normalizer);
             return integral;
         }
-
+        /// <summary>
+        /// The context that holds all the data needed for particle distribution by any Particle Distributor.
+        /// This is used for customizing and pre processing particle properties for custom distributions.
+        /// Used in <see cref="ParticleDistributor.Process(ProcessContext)"/> and <see cref="ParticleDistributor.ProcessProperties(ProcessContext, Vector3, float)"/>
+        /// </summary>
         public struct ProcessContext
         {
+            /// <summary>
+            /// The Context's particle.
+            /// </summary>
             public Particle particle;
+            /// <summary>
+            /// The Galaxy Prefab.
+            /// </summary>
             public GalaxyPrefab galaxy;
+            /// <summary>
+            /// The Particles Prefab.
+            /// </summary>
             public ParticlesPrefab particles;
+            /// <summary>
+            /// The time of the distributed particle.
+            /// Used by distribution algorithms.
+            /// </summary>
             public float time;
+            /// <summary>
+            /// The index of the given particle.
+            /// This is the global index of the particle.
+            /// </summary>
             public float index;
 
+            /// <summary>
+            /// Default constructor
+            /// </summary>
+            /// <param name="particle"></param>
+            /// <param name="galaxy"></param>
+            /// <param name="particles"></param>
+            /// <param name="time"></param>
+            /// <param name="index"></param>
             public ProcessContext(Particle particle, GalaxyPrefab galaxy, ParticlesPrefab particles, float time, float index)
             {
                 this.particle = particle;

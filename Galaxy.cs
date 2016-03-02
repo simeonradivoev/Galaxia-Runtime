@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Galaxia
 {
     /// <summary>
-    /// The Component that holds and manages visualisation of GalaxyPrefab
+    /// The Component that holds and manages visualization of GalaxyPrefab
     /// </summary>
     public sealed class Galaxy : MonoBehaviour
     {
@@ -94,7 +94,7 @@ namespace Galaxia
                 }
                 else
                 {
-                    Debug.LogError("Particle Prefab was destoryed or missing");
+                    Debug.LogError("Particle Prefab was destroyed or missing");
                 }
             }else
             {
@@ -272,13 +272,16 @@ namespace Galaxia
 
         #endregion
         #region Getters And Setters
+        /// <summary>
+        /// A Utility function for getting the position of the Galaxy Component.
+        /// </summary>
         public Vector3 Position { get { return transform.position; } set { transform.position = value; } }
         /// <summary>
-        /// List of <see name="Particles" cref="T:Galaxia.Particles"/> that holds the Components responsible for the individual visualisation of the <see name="Particle Prefabs" cref="T:Galaxia.ParticlesPrefabs"/>.
+        /// List of <see name="Particles" cref="T:Galaxia.Particles"/> that holds the Components responsible for the individual visualization of the <see name="Particle Prefabs" cref="T:Galaxia.ParticlesPrefabs"/>.
         /// </summary>
         public List<Particles> Particles { get { return particles; } }
         /// <summary>
-        /// This dictates if the <see name="Galaxy" cref="T:Galaxia.Galaxy"/> updates automaticly when a Proprty is changed.
+        /// This dictates if the <see name="Galaxy" cref="T:Galaxia.Galaxy"/> updates automatically when a Property is changed.
         /// If it is set to manual, <see name="GenerateParticles()" cref="M:Galaxia.Galaxy.GenerateParticles"/> or <see name="UpdateParticles()" cref="M:Galaxia.Galaxy.UpdateParticles"/> must be called every time the galaxy is changed.
         /// </summary>
         public GalaxyGenerationType GenerationType { get { return m_generationType; } set { m_generationType = value; } }
@@ -304,7 +307,7 @@ namespace Galaxia
         }
         /// <summary>
         /// Returns if DirectX 11 is supported on the software.
-        /// If it is avalible you can disable it from here.
+        /// If it is available you can disable it from here.
         /// </summary>
         [Obsolete("New Function is GPU")]
         public bool DirectX11
@@ -333,12 +336,16 @@ namespace Galaxia
                 }
             }
         }
-
+        /// <summary>
+        /// Checks if the currently utilized Graphics API is OpenGL instead of DirectX
+        /// </summary>
         public static bool OpenGL
         {
             get { return SystemInfo.graphicsDeviceVersion.Contains("OpenGL"); }
         }
-
+        /// <summary>
+        /// Checks if the DirectX is the current Graphics API and if so then is it >= than DX11
+        /// </summary>
         public static bool SupportsDirectX11
         {
             get { return !OpenGL && SystemInfo.graphicsShaderLevel >= 40; }
@@ -346,9 +353,18 @@ namespace Galaxia
 
         #endregion
         #region enums
+        /// <summary>
+        /// Used for specifying the Galaxy Particle Generation Type.
+        /// </summary>
         public enum GalaxyGenerationType
         {
+            /// <summary>
+            /// generates particles when the Galaxy Prefab properties change.
+            /// </summary>
             Automatic,
+            /// <summary>
+            /// used to manually generate particles.
+            /// </summary>
             Manual
         }
         #endregion

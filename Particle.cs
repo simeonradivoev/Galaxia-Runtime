@@ -2,6 +2,9 @@
 
 namespace Galaxia
 {
+    /// <summary>
+    /// Main data storage class for particles
+    /// </summary>
     [System.Serializable]
     public class Particle
     {
@@ -45,13 +48,37 @@ namespace Galaxia
         }
         #endregion
         #region Getters and setters
+        /// <summary>
+        /// The Position of the particle
+        /// </summary>
         public Vector3 position { get { return m_position; } set { m_position = value; } }
+        /// <summary>
+        /// The Color of the particle
+        /// </summary>
         public Color color { get { return m_color; } set { m_color = value; } }
+        /// <summary>
+        /// The size of the particle
+        /// </summary>
         public float size { get { return m_size; } set { m_size = value; } }
+        /// <summary>
+        /// The rotation of the particle
+        /// </summary>
         public float rotation { get { return m_rotation; } set { m_rotation = value; } }
+        /// <summary>
+        /// The focal point of the particle's elliptical orbit.
+        /// </summary>
         public float focalPoint { get { return m_focalPoint; } set { m_focalPoint = value; } }
+        /// <summary>
+        /// The starting time of the particle. Used by distribution algorithms.
+        /// </summary>
         public float startingTime { get { return m_startingTime; } set { m_startingTime = value; } }
+        /// <summary>
+        /// The global index of the particle.
+        /// </summary>
         public float index { get { return m_index; } set { m_index = value; } }
+        /// <summary>
+        /// The sheet position of the particle. Used by particle rendering for having multiple particle type from one texture sheet.
+        /// </summary>
         public int sheetPosition { get { return m_sheetPosition; } set { m_sheetPosition = value; } }
         #endregion
     }

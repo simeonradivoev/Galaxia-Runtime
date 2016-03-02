@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace Galaxia
 {
+    /// <summary>
+    /// The star Finder helper component.
+    /// Used to find particular stars.
+    /// </summary>
     public class StarFinder : MonoBehaviour
     {
         #region Private

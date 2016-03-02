@@ -5,10 +5,18 @@ using UnityEngine.Rendering;
 
 namespace Galaxia
 {
+    /// <summary>
+    /// This is the component class that holds the galaxy meshes and handles the visualization of the particles.
+    /// This is the main connection between Galaxia and Unity.
+    /// </summary>
     [System.Serializable]
     public sealed class Particles : MonoBehaviour
     {
         #region Constants
+        /// <summary>
+        /// The maximum amount of vertex per mesh.
+        /// This is used to get around the limitation of Unity's meshes having a max vertex count.
+        /// </summary>
         public const int MAX_VERTEX_PER_MESH = 40000;
         #endregion
         #region Private
@@ -37,6 +45,7 @@ namespace Galaxia
         /// </summary>
         /// <param name="Prefab">The Particle prefab to use</param>
         /// <param name="galaxy">The galaxy prefab</param>
+        /// <param name="gpu">Should the generation be using the GPU acceleration</param>
         public void Generate(ParticlesPrefab Prefab, GalaxyPrefab galaxy,bool gpu)
         {
             this.m_prefab = Prefab;
@@ -76,7 +85,7 @@ namespace Galaxia
 
         /// <summary>
         /// Rebuilds the renderers with the generated mesh
-        /// if the system doesn not support geometry shaders it will build it with unity's particle system
+        /// if the system doesn't not support geometry shades it will build it with unity's particle system
         /// </summary>
         internal void Build()
         {
@@ -122,6 +131,10 @@ namespace Galaxia
             }
         }
 
+        /// <summary>
+        /// Draws the generated particles meshes now.
+        /// This is function <see cref="Graphics.DrawMeshNow"/>
+        /// </summary>
         public void DrawNow()
         {
             if (m_gpu)
@@ -145,6 +158,10 @@ namespace Galaxia
             }
         }
 
+        /// <summary>
+        /// Queues the particle meshes for drawing next frame.
+        /// This can be used anywhere.
+        /// </summary>
         public void Draw()
         {
             if (m_gpu)
@@ -185,7 +202,6 @@ namespace Galaxia
         /// <summary>
         /// Updates the generated meshes with the information from the particle data list
         /// </summary>
-        /// <param name="galaxy">The galaxy prefab</param>
         void UpdateMeshes()
         {
             if (Galaxy.SupportsDirectX11)
@@ -343,7 +359,6 @@ namespace Galaxia
         /// Update the particle data list without destroying it
         /// Resizes the array as needed
         /// </summary>
-        /// <param name="galaxy">The galaxy prefab</param>
         void UpdateParticleList()
         {
             if (m_particleList == null)
@@ -376,6 +391,9 @@ namespace Galaxia
                 
         }
 
+        /// <summary>
+        /// Destroys all particle meshes and all renderers as well as the Game Object the component is attached to.
+        /// </summary>
         public void Destroy()
         {
             DestoryMeshes();
@@ -416,13 +434,41 @@ namespace Galaxia
         }
 
         #region Getters and setters
+        /// <summary>
+        /// The Particles Prefab
+        /// </summary>
         public ParticlesPrefab Prefab { get { return m_prefab; } }
+        /// <summary>
+        /// The list of Particles
+        /// </summary>
         public Particle[] ParticleList { get { return m_particleList; } }
+        /// <summary>
+        /// The list of Game object renderers.
+        /// These are the Game objects that have mesh renderers attached to them.
+        /// They are used when in-game to render particle meshes more efficiently.
+        /// </summary>
         public GameObject[] Renderers { get { return m_renderers; } }
+        /// <summary>
+        /// All the Particle meshes. Multiple meshes can be generated because of Unity's mesh vertex cap.
+        /// </summary>
         public Mesh[] Meshes { get { return m_meshes; } }
+        /// <summary>
+        /// Shows if the Particles Prefab has changed. And the particles need to be rebuilt.
+        /// </summary>
         public bool NeedsRebuild { get { return m_needsRebuild; } set { m_needsRebuild = value; } }
+        /// <summary>
+        /// Shows if the articles Prefab has changed. And the particles need to be updated.
+        /// </summary>
         public bool NeedsUpdate { get { return m_needsUpdate; } set { m_needsUpdate = value; } }
+        /// <summary>
+        /// The Galaxy Prefab
+        /// </summary>
         public GalaxyPrefab GalaxyPrefab { get { return m_galaxyPrefab; } set { m_galaxyPrefab = value; } }
+        /// <summary>
+        /// The Galaxy Component of the parent.
+        /// The Particles component is attached to children objects added to the Main Game Object with the Galaxy component.
+        /// The Children objects are hidden from the Unity's inspector.
+        /// </summary>
         public Galaxy Galaxy {
             get {
                 if(transform.parent != null)

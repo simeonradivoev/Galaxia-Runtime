@@ -79,11 +79,24 @@ namespace Galaxia
         #endregion
         #endregion
 
+        /// <summary>
+        /// Used to assign a Galaxy Prefab.
+        /// </summary>
+        /// <param name="prefab"></param>
         public void SetUp(GalaxyPrefab prefab)
         {
             m_galaxyPrefab = prefab;
         }
 
+        /// <summary>
+        /// Gets the color for given parameters.
+        /// </summary>
+        /// <param name="pos">The position of the particle.</param>
+        /// <param name="distance"> the distance of the particle from the center of the galaxy.</param>
+        /// <param name="GalaxySize"> The Size of the galaxy.</param>
+        /// <param name="angle"> The angle of the orbit.</param>
+        /// <param name="index">The global index of the particle.</param>
+        /// <returns></returns>
         public Color GetColor(Vector3 pos,float distance, float GalaxySize, float angle,float index)
         {
             float colorPos = GetEvaluationPosition(m_colorDistributor, pos, distance, GalaxySize, angle, index);
@@ -92,15 +105,30 @@ namespace Galaxia
             c.a *= Mathf.Lerp(m_alphaDistributor.DistributionCurve.Evaluate(alphaPos), Random.Next(), m_alphaDistributor.Variation) * m_alphaDistributor.Multiplayer * m_colorDistributor.DistributionCurve.Evaluate(colorPos);
             return c;
         }
-
-
+        /// <summary>
+        /// Gets the size of a particle.
+        /// </summary>
+        /// <param name="pos">the position of the particle.</param>
+        /// <param name="distance"> the distance of the particle from the center of the galaxy.</param>
+        /// <param name="GalaxySize"> The Size of the galaxy.</param>
+        /// <param name="angle"> The angle of the orbit.</param>
+        /// <param name="index">The global index of the particle.</param>
+        /// <returns></returns>
         public float GetSize(Vector3 pos,float distance, float GalaxySize, float angle, float index)
         {
             float sizePos = GetEvaluationPosition(m_sizeDistributor, pos, distance, GalaxySize, angle, index);
             float size = Mathf.Lerp(m_sizeDistributor.DistributionCurve.Evaluate(sizePos), Random.Next(), m_sizeDistributor.Variation) * Size;
             return size * m_sizeDistributor.Multiplayer;
         }
-
+        /// <summary>
+        /// Gets the rotation of a particle.
+        /// </summary>
+        /// <param name="pos">the position of the particle.</param>
+        /// <param name="distance"> the distance of the particle from the center of the galaxy.</param>
+        /// <param name="GalaxySize"> The Size of the galaxy.</param>
+        /// <param name="angle"> The angle of the orbit.</param>
+        /// <param name="index">The global index of the particle.</param>
+        /// <returns></returns>
         public float GetRotation(Vector3 pos, float distance, float GalaxySize, float angle, float index)
         {
             float rotationPos = GetEvaluationPosition(m_rotationDistributor, pos, distance, GalaxySize, angle, index);
@@ -127,16 +155,26 @@ namespace Galaxia
             }
         }
 
+        /// <summary>
+        /// Get's a random rotation.
+        /// </summary>
+        /// <returns></returns>
         public float GetRotation()
         {
             return Random.Next() * Mathf.PI * 2;
         }
 
+        /// <summary>
+        /// Updates the Particles Prefab Internal material. With all the uniform variables from it's galaxy prefab.
+        /// </summary>
         public void UpdateMaterial()
         {
             UpdateMaterial(GalaxyPrefab);
         }
 
+        /// <summary>
+        /// Updates the Particles Prefab Internal material. With all the uniform variables from the given Galaxy Prefab.
+        /// </summary>
         public void UpdateMaterial(GalaxyPrefab prefab)
         {
             if (m_material == null)
@@ -185,7 +223,9 @@ namespace Galaxia
                 //m_material.SetFloat("AnimationSpeed", speed);
             }
         }
-
+        /// <summary>
+        /// Destroys the Particle Prefab.
+        /// </summary>
         public void DestoryPrefab()
         {
             GameObject.DestroyImmediate(m_material,true);
@@ -193,7 +233,13 @@ namespace Galaxia
         }
 
         #region Getters and Setters
+        /// <summary>
+        /// Is the prefab active.
+        /// </summary>
         public bool active { get { return m_active; } set { m_active = value; } }
+        /// <summary>
+        /// The amount of particles the prefab has.
+        /// </summary>
         public int Count
         {
             get { return m_count; }
@@ -204,6 +250,9 @@ namespace Galaxia
                     GalaxyPrefab.RecreateAllGalaxies();
             }
         }
+        /// <summary>
+        /// The seed of the prefab.
+        /// </summary>
         public int Seed
         {
             get { return m_seed; }
@@ -214,6 +263,9 @@ namespace Galaxia
                     GalaxyPrefab.UpdateAllGalaxies(this);
             }
         }
+        /// <summary>
+        /// The size of the prefab.
+        /// </summary>
         public float Size
         {
             get { return m_size; }
@@ -224,8 +276,17 @@ namespace Galaxia
                     GalaxyPrefab.UpdateAllGalaxies(this);
             }
         }
+        /// <summary>
+        /// The maximum screen size for every particle in the prefab
+        /// </summary>
         public float MaxScreenSize { get { return m_maxScreenSize; } set { m_maxScreenSize = value; } }
+        /// <summary>
+        /// The particle texture sheet power factor.
+        /// </summary>
         public int TextureSheetPow { get { return m_textureSheetPower; } set { m_textureSheetPower = value; } }
+        /// <summary>
+        /// The Size Distributor Property
+        /// </summary>
         public DistributionProperty SizeDistributor
         {
             get { return m_sizeDistributor; }
@@ -236,6 +297,9 @@ namespace Galaxia
                     GalaxyPrefab.UpdateAllGalaxies(this);
             }
         }
+        /// <summary>
+        /// The Rotation Distributor property
+        /// </summary>
         public DistributionProperty RotationDistributor
         {
             get { return m_rotationDistributor; }
@@ -246,6 +310,9 @@ namespace Galaxia
                     GalaxyPrefab.UpdateAllGalaxies(this);
             }
         }
+        /// <summary>
+        /// The Alpha distributor property
+        /// </summary>
         public DistributionProperty AlphaDistributor
         {
             get { return m_alphaDistributor; }
@@ -256,6 +323,9 @@ namespace Galaxia
                     GalaxyPrefab.UpdateAllGalaxies(this);
             }
         }
+        /// <summary>
+        /// The color Distributor property
+        /// </summary>
         public DistributionProperty ColorDistributor
         {
             get { return m_colorDistributor; }
@@ -266,6 +336,9 @@ namespace Galaxia
                     GalaxyPrefab.UpdateAllGalaxies(this);
             }
         }
+        /// <summary>
+        /// The position distributor property
+        /// </summary>
         public AnimationCurve PositionDistribution
         {
             get { return m_positionDistribution; }
@@ -276,6 +349,9 @@ namespace Galaxia
                     GalaxyPrefab.UpdateAllGalaxies(this);
             }
         }
+        /// <summary>
+        /// The color Gradient
+        /// </summary>
         public Gradient Color
         {
             get { return m_color; }
@@ -286,6 +362,9 @@ namespace Galaxia
                     GalaxyPrefab.UpdateAllGalaxies(this);
             }
         }
+        /// <summary>
+        /// The Color Overlay
+        /// </summary>
         public Color ColorOverlay
         {
             get { return m_colorOverlay; }
@@ -295,6 +374,9 @@ namespace Galaxia
                 UpdateMaterial(GalaxyPrefab);
             }
         }
+        /// <summary>
+        /// The texture
+        /// </summary>
         public Texture2D Texture
         {
             get { return m_texture; }
@@ -303,12 +385,24 @@ namespace Galaxia
                 m_texture = value;
             }
         }
+        /// <summary>
+        /// The original Preset of the prefab.
+        /// </summary>
         public Preset OriginalPreset { get { return m_originalPreset; } internal set { m_originalPreset = value; } }
+        /// <summary>
+        /// The internal prefab material
+        /// </summary>
         public Material Material { get { return m_material; } internal set { m_material = value; } }
+        /// <summary>
+        /// The galaxy Prefab
+        /// </summary>
         public GalaxyPrefab GalaxyPrefab { get { return m_galaxyPrefab; } }
         #endregion
 
         #region enums
+        /// <summary>
+        /// The Star Preset Types
+        /// </summary>
         public enum Preset
         {
             None,

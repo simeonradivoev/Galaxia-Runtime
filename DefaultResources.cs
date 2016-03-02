@@ -2,6 +2,9 @@
 
 namespace Galaxia
 {
+    /// <summary>
+    /// Stores default values for Curves used in the Galaxy Prefab
+    /// </summary>
     public static class DefaultResources
     {
         public static Gradient StarColorGradient

@@ -70,7 +70,10 @@ namespace Galaxia
             if (shaderBruteForceGLSL == null)
                 shaderBruteForceGLSL = Resources.Load<Shader>("Shaders/ParticleBillboardBruteForceGLSL");
         }
-
+        /// <summary>
+        /// Gets the Enumerator for all of the particle prefabs
+        /// </summary>
+        /// <returns>The Enumerator for all the particle prefabs</returns>
         public IEnumerator<ParticlesPrefab> GetEnumerator()
         {
             return m_particlePrefabs.GetEnumerator();

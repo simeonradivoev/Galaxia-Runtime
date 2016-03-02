@@ -340,7 +340,7 @@ namespace SharpNeatLib.Maths
 			return (bitBuffer & (bitMask>>=1))==0;
 		}
 
-        public int Seed { get { return (int)x; } }
+		public int Seed { get { return (int)x; } }
 
 		#endregion
 	}

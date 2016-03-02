@@ -29,10 +29,10 @@ namespace Galaxia
         /// The main function for star orbits in the galaxy.
         /// It also calculates the color of each particle
         /// </summary>
-        /// <param name="_particle">The particle to use, to calucate it's position</param>
+        /// <param name="_particle">The particle to use, to calculate it's position</param>
         /// <param name="galaxy">The GalaxyPrefab that holds all the information on the galaxy generation</param>
         /// <param name="particles">The ParticlePrefab that holds the information on the particle itself</param>
-        /// <param name="center">The local center of the galaxy. It is adviced to use the transform of the galaxy to move it</param>
+        /// <param name="center">The local center of the galaxy. It is advised to use the transform of the galaxy to move it</param>
         /// <param name="angleRotation">the global rotation for all the particles a.k.a. the time</param>
         /// <param name="index">the index of the particle</param>
         public override void Process(ProcessContext context)
