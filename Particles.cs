@@ -423,7 +423,15 @@ namespace Galaxia
         public bool NeedsRebuild { get { return m_needsRebuild; } set { m_needsRebuild = value; } }
         public bool NeedsUpdate { get { return m_needsUpdate; } set { m_needsUpdate = value; } }
         public GalaxyPrefab GalaxyPrefab { get { return m_galaxyPrefab; } set { m_galaxyPrefab = value; } }
-        public Galaxy Galaxy { get { return transform.parent.GetComponent<Galaxy>(); } }
+        public Galaxy Galaxy {
+            get {
+                if(transform.parent != null)
+                {
+                    return transform.parent.GetComponent<Galaxy>();
+                }
+                return null;
+            }
+        }
         #endregion
     }
 }
