@@ -76,7 +76,7 @@ namespace Galaxia
 
         void OnRenderObject()
         {
-            if (GalaxyPrefab != null && Galaxy != null)
+            if (GalaxyPrefab != null && Galaxy != null && Camera.current && Camera.current.cullingMask == (Camera.current.cullingMask | (1 << gameObject.layer)))
             {
                 DrawNow();
             }
