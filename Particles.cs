@@ -38,6 +38,7 @@ namespace Galaxia
         private bool m_gpu = true;
         private bool m_needsRebuild = true;
         private bool m_needsUpdate = true;
+	    private float m_time = 0;
         #endregion
 
         /// <summary>
@@ -110,6 +111,14 @@ namespace Galaxia
                 }
             }
         }
+
+		/// <summary>
+		/// Used to forcefully update the particles
+		/// </summary>
+	    public void ForceUpdateParticles()
+	    {
+		    UpdateParticles();
+	    }
 
         internal void UpdateParticles()
         {
@@ -328,6 +337,7 @@ namespace Galaxia
 
         void UpdateShuriken()
         {
+	        if (Renderers == null) return;
             foreach(GameObject g in Renderers)
             {
                 ParticleSystem system = g.GetComponent<ParticleSystem>();
@@ -342,18 +352,52 @@ namespace Galaxia
         /// </summary>
         void UpdateRenderer()
         {
-            if (Renderers != null && Prefab != null)
-            {
-                foreach (GameObject g in Renderers)
-                {
-                    Renderer renderer = g.GetComponent<Renderer>();
-                    if(renderer != null)
-                    {
-                        renderer.enabled = Prefab.active;
-                    }
-                }
-            }
+	        if (Renderers == null || Prefab == null) return;
+	        foreach (GameObject g in Renderers)
+	        {
+		        Renderer renderer = g.GetComponent<Renderer>();
+		        if(renderer != null)
+		        {
+			        renderer.enabled = Prefab.active;
+		        }
+	        }
         }
+
+	    /// <summary>
+		/// Update the particle data list without destroying it
+		/// Resizes the array as needed
+		/// </summary>
+		/// <param name="time">The global time of the particles. This is mainly used for animations.</param>
+		void UpdateParticleList(float time)
+	    {
+			if (m_particleList == null)
+			{
+				m_particleList = new Particle[m_prefab.Count];
+			}
+
+			if (m_galaxyPrefab.Distributor != null && m_prefab != null)
+			{
+				if (m_particleList.Length != m_prefab.Count)
+				{
+					System.Array.Resize<Particle>(ref m_particleList, m_prefab.Count);
+				}
+
+				Random.seed = (int)(m_prefab.Seed);
+				for (int i = 0; i < m_prefab.Count; i++)
+				{
+					m_particleList[i] = new Particle();
+					m_particleList[i].index = i;
+					m_galaxyPrefab.Distributor.Process(new ParticleDistributor.ProcessContext(m_particleList[i], m_galaxyPrefab, m_prefab, time, i));
+				}
+			}
+			else
+			{
+				if (m_galaxyPrefab.Distributor == null)
+					Debug.LogWarning("No Particle Distributor");
+				if (m_prefab == null)
+					Debug.LogWarning("No Particle Distributor");
+			}
+		}
 
         /// <summary>
         /// Update the particle data list without destroying it
@@ -361,34 +405,7 @@ namespace Galaxia
         /// </summary>
         void UpdateParticleList()
         {
-            if (m_particleList == null)
-            {
-                m_particleList = new Particle[m_prefab.Count];
-            }
-
-            if (m_galaxyPrefab.Distributor != null && m_prefab != null)
-            {
-                if (m_particleList.Length != m_prefab.Count)
-                {
-                    System.Array.Resize<Particle>(ref m_particleList, m_prefab.Count);
-                }
-
-                Random.seed = (int)(m_prefab.Seed);
-                for (int i = 0; i < m_prefab.Count; i++)
-                {
-                    m_particleList[i] = new Particle();
-                    m_particleList[i].index = i;
-                    m_galaxyPrefab.Distributor.Process(new ParticleDistributor.ProcessContext(m_particleList[i], m_galaxyPrefab, m_prefab, 0, i));
-                }
-            }
-            else
-            {
-                if (m_galaxyPrefab.Distributor == null)
-                    Debug.LogWarning("No Particle Distributor");
-                if (m_prefab == null)
-                    Debug.LogWarning("No Particle Distributor");
-            }
-                
+            UpdateParticleList(m_time);
         }
 
         /// <summary>
@@ -405,19 +422,17 @@ namespace Galaxia
 
         void DestroyRenderers()
         {
-            if (m_renderers != null)
-            {
-                foreach (GameObject renderer in m_renderers)
-                {
-                    if (renderer != null)
-                    {
-                        //GameObject.DestroyImmediate(renderer.GetComponent<MeshFilter>().sharedMesh, true);
-                        GameObject.DestroyImmediate(renderer);
-                    }
-                }
+	        if (m_renderers == null) return;
+	        foreach (GameObject renderer in m_renderers)
+	        {
+		        if (renderer != null)
+		        {
+			        //GameObject.DestroyImmediate(renderer.GetComponent<MeshFilter>().sharedMesh, true);
+			        GameObject.DestroyImmediate(renderer);
+		        }
+	        }
 
-                m_renderers = null;
-            }
+	        m_renderers = null;
         }
 
         void DestoryMeshes()
@@ -478,6 +493,16 @@ namespace Galaxia
                 return null;
             }
         }
-        #endregion
+		/// <summary>
+		/// The Time of the particles.
+		/// Used manly for animations.
+		/// </summary>
+	    public float Time
+	    {
+		    get { return m_time; }
+			set { m_time = value; }
+	    }
+
+	    #endregion
     }
 }

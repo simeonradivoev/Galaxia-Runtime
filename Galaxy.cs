@@ -170,7 +170,11 @@ namespace Galaxia
                 } 
             }
         }
-        void ForceUpdateParticles()
+
+		/// <summary>
+		/// Forces all <see name="Particles" cref="T:Galaxia.Particles"/> to update Immediately
+		/// </summary>
+		public void UpdateParticlesImmediately()
         {
             //Debug.Log("Updating particles");
 
@@ -188,6 +192,7 @@ namespace Galaxia
                 }
             }
         }
+
         /// <summary>
         /// Marks a <see name="Particles Component" cref="T:Galaxia.Particles"/> with a given <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> for Update, next frame.
         /// </summary>
@@ -202,7 +207,12 @@ namespace Galaxia
                 }
             }
         }
-        void ForceUpdateParticles(ParticlesPrefab prefab)
+
+		/// <summary>
+		/// Forces all <see name="Particles Component" cref="T:Galaxia.Particles"/> with a given <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> to update Immediately.
+		/// </summary>
+		/// <param name="prefab">The ParticlesPrefab to search for</param>
+		public void UpdateParticlesImmediately(ParticlesPrefab prefab)
         {
             foreach (Particles particle in particles)
             {
@@ -212,6 +222,7 @@ namespace Galaxia
                 }
             }
         }
+
         #endregion
         void Update()
         {
@@ -367,6 +378,19 @@ namespace Galaxia
             /// </summary>
             Manual
         }
+
+		/// <summary>
+		/// A utility method for setting the time of all Particles on the Galaxy.
+		/// Used mainly for animations.
+		/// </summary>
+		/// <param name="time">The time of the particles.</param>
+	    public void SetParticlesTime(float time)
+	    {
+		    foreach (Particles particle in particles)
+		    {
+			    particle.Time = time;
+		    }
+	    }
         #endregion
 
     }
