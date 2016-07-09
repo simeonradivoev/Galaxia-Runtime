@@ -1,4 +1,9 @@
-﻿using UnityEngine;
+﻿// ----------------------------------------------------------------
+// Galaxia
+// ©2016 Simeon Radivoev
+// Written by Simeon Radivoev (simeonradivoev@gmail.com)
+// ----------------------------------------------------------------
+using UnityEngine;
 
 namespace Galaxia
 {
@@ -15,6 +20,7 @@ namespace Galaxia
         public const float G = 6.67384f;
         #endregion
         #region Private
+		private GalaxyPrefab m_galaxyPrefab;
         #endregion
         #region Abstract methods
         /// <summary>
@@ -25,7 +31,7 @@ namespace Galaxia
         /// <param name="context">The context holds information on the current particle and Galaxy Object.</param>
         public abstract void Process(ProcessContext context);
         /// <summary>
-        /// Used to process any additional properties dependant on the position and angle of a particle
+        /// Used to process any additional properties dependent on the position and angle of a particle
         /// </summary>
         /// <param name="context"></param>
         /// <param name="pos"></param>
@@ -36,14 +42,12 @@ namespace Galaxia
             context.particle.size = context.particles.GetSize(pos, pos.magnitude, context.galaxy.Size, angle, context.particle.index);
             context.particle.rotation = context.particles.GetRotation(pos, pos.magnitude, context.galaxy.Size, angle, context.particle.index);
         }
-        /// <summary>
-        /// Updates all uniform variables in the given material
-        /// </summary>
-        /// <param name="material">the given material</param>
-        public virtual void UpdateMaterial(Material material)
-        {
 
-        }
+	    /// <summary>
+	    /// Updates all uniform variables in the given material
+	    /// </summary>
+	    /// <param name="material">the given material</param>
+	    public virtual void UpdateMaterial(Material material) { }
         #endregion
         #region Virtual Methods
         /// <summary>
@@ -156,6 +160,20 @@ namespace Galaxia
             }
             return inverse;
         }
-        #endregion
-    }
+		#endregion
+
+		#region Getters and Setters
+
+	    internal void SetGalaxyPrefab(GalaxyPrefab galaxyPrefab)
+	    {
+		    m_galaxyPrefab = galaxyPrefab;
+	    }
+
+	    public GalaxyPrefab GalaxyPrefab
+	    {
+		    get { return m_galaxyPrefab; }
+	    }
+
+	    #endregion
+	}
 }

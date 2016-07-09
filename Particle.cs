@@ -1,9 +1,14 @@
-﻿using UnityEngine;
+﻿// ----------------------------------------------------------------
+// Galaxia
+// ©2016 Simeon Radivoev
+// Written by Simeon Radivoev (simeonradivoev@gmail.com)
+// ----------------------------------------------------------------
+using UnityEngine;
 
 namespace Galaxia
 {
     /// <summary>
-    /// Main data storage class for particles
+    /// Main data storage class for particles.
     /// </summary>
     [System.Serializable]
     public class Particle
@@ -27,22 +32,28 @@ namespace Galaxia
         private int m_sheetPosition;
         #endregion
         #region Methods
-        public static implicit operator ParticleSystem.Particle(Particle p)
+        /// <summary>
+        /// Converts to Unity's particle system particle
+        /// </summary>
+        /// <param name="p"></param>
+        /// <param name="sheetSize">The sheet power size.</param>
+        /// <returns></returns>
+        public static ParticleSystem.Particle ConvertToParticleSystem(Particle p,int sheetSize)
         {
             ParticleSystem.Particle particle = new ParticleSystem.Particle();
-            particle.color = p.color;
+            particle.startColor = p.color;
             particle.position = p.position;
-            particle.lifetime = Mathf.Infinity;
-            particle.startLifetime = Mathf.Infinity;
-            particle.size = p.size;
+            particle.lifetime = p.sheetPosition;
+            particle.startLifetime = sheetSize* sheetSize;
+            particle.startSize = p.size;
             particle.rotation = p.rotation * Mathf.Rad2Deg;
             return particle;
         }
 
-        public static implicit operator Particle(ParticleSystem.Particle p)
+		public static implicit operator Particle(ParticleSystem.Particle p)
         {
             Particle particle = new Particle();
-            particle.color = p.color;
+            particle.color = p.startColor;
             particle.position = p.position;
             return particle;
         }

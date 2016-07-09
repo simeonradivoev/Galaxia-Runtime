@@ -1,14 +1,18 @@
-﻿#define HIDE_SUB_ASSETS
-#define EDIT_RESOURCES
+﻿// ----------------------------------------------------------------
+// Galaxia
+// ©2016 Simeon Radivoev
+// Written by Simeon Radivoev (simeonradivoev@gmail.com)
+// ----------------------------------------------------------------
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-
+using UnityEngine.Events;
 
 namespace Galaxia
 {
     /// <summary>
-    /// The Component that holds and manages visualization of GalaxyPrefab
+    /// The Component that holds and manages visualization of <see cref="Galaxia.GalaxyPrefab"/>
     /// </summary>
     public sealed class Galaxy : MonoBehaviour
     {
@@ -18,60 +22,82 @@ namespace Galaxia
         [SerializeField]
         [HideInInspector]
         private List<Particles> particles;
-        [SerializeField]
+        [SerializeField,HideInInspector]
         private GalaxyGenerationType m_generationType;
-        [SerializeField]
+        [SerializeField,HideInInspector]
         private bool m_gpu = true;
+	    [SerializeField,HideInInspector] private bool m_render_galaxy = true;
+	    [SerializeField, HideInInspector] private bool m_frustumCulling = true;
         [SerializeField]
         private GalaxyPrefab m_galaxy;
-        #endregion
-        #region Constructors
-        void OnEnable()
+		[SerializeField,HideInInspector]
+		private bool m_saveMeshes;
+		[SerializeField, HideInInspector]
+		private bool m_saveParticles;
+		#endregion
+		#region Events
+		private RenderEventHandler m_preRenderHandler;
+		private RenderEventHandler m_postRenderHandler;
+	    private RenderEvent lastPreRenderEvent = new RenderEvent(false);
+		#endregion
+		#region Constructors
+		void OnEnable()
         {
-            if (GalaxyPrefab != null)
-            {
-                GenerateParticles();
-            }
-        }
+			SmartParticleInitialization();
+
+			if (m_preRenderHandler == null)
+				m_preRenderHandler = new RenderEventHandler();
+			if (m_postRenderHandler == null)
+				m_postRenderHandler = new RenderEventHandler();
+		}
         #endregion
         #region Methods
         #region Particle Generation and Update
+
+		/// <summary>
+		/// Initializes or updates the galaxy and each of it's particles only when necessary.
+		/// </summary>
+	    public void SmartParticleInitialization()
+	    {
+		    if (particles == null)
+		    {
+			    GenerateParticles();
+				return;
+		    }
+
+			//if the particles components were destroyed without us knowing
+		    if (particles.Any(t => !t))
+		    {
+			    GenerateParticles();
+			    return;
+		    }
+
+		    foreach (var particle in particles)
+		    {
+			    particle.NeedsRebuild = !m_gpu;
+			    particle.NeedsUpdate = particle.CalculateNeedsUpdate();
+		    }
+	    }
+
         /// <summary>
-        /// Generates <see name="Particles" cref="T:Galaxia.Particles"/> to all the <see name="Particle Prefabs" cref="T:Galaxia.ParticlesPrefab"/> in the galaxy
+        /// Generates <see cref="Galaxia.Particles"/> to all the <see cref="Galaxia.ParticlesPrefab"/> in the galaxy
         /// This function only generates the particles, not the Meshes
         /// </summary>
         public void GenerateParticles()
         {
             DestroyParticles();
 
-            if (GalaxyPrefab != null)
-            {
-                foreach (ParticlesPrefab prefab in GalaxyPrefab)
-                {
-                    if (prefab != null)
-                    {
-                        GameObject obj = new GameObject(prefab.name,typeof(Particles));
-                        #if HIDE_SUB_ASSETS
-                        obj.hideFlags = HideFlags.HideInHierarchy;
-                        #endif
-                        #if EDIT_RESOURCES
-                        obj.hideFlags |= HideFlags.NotEditable;
-                        #endif
-                        obj.transform.parent = transform;
-                        Particles p = obj.GetComponent<Particles>();
-                        p.Generate(prefab, GalaxyPrefab, GPU);
-                        particles.Add(p);
-                        prefab.CreateMaterial(GalaxyPrefab,GPU);
-                        prefab.UpdateMaterial(GalaxyPrefab);
-                    }
-                }
-            }
+	        if (!GalaxyPrefab) return;
+	        foreach (ParticlesPrefab prefab in GalaxyPrefab.Where(prefab => prefab != null))
+	        {
+		        GenerateParticles(prefab);
+	        }
         }
 
         /// <summary>
-        /// Same as the <see name="GenerateParticles()" cref="M:Galaxia.Galaxy.GenerateParticles"/> but for a specific <see name="Particle Prefab" cref="T:Galaxia.ParticlesPrefab"/>
+        /// Same as the <see cref="Galaxia.Galaxy.GenerateParticles()"/> but for a specific <see cref="Galaxia.ParticlesPrefab"/>
         /// </summary>
-        /// <param name="prefab" type="T:Galaxia.ParticlesPrefab">The Particles Prefab to use for the generation</param>
+        /// <param name="prefab">The Particles Prefab to use for the generation</param>
         public void GenerateParticles(ParticlesPrefab prefab)
         {
             if (GalaxyPrefab != null)
@@ -79,14 +105,9 @@ namespace Galaxia
                 if (prefab != null)
                 {
                     GameObject obj = new GameObject(prefab.name, typeof(Particles));
-                    #if HIDE_SUB_ASSETS
-                    obj.hideFlags = HideFlags.HideInHierarchy;
-                    #endif
-                    #if EDIT_RESOURCES
-                    obj.hideFlags |= HideFlags.NotEditable;
-                    #endif
-                    obj.transform.parent = transform;
+					obj.transform.parent = transform;
                     Particles p = obj.GetComponent<Particles>();
+					p.Init();
                     p.Generate(prefab, GalaxyPrefab, GPU);
                     particles.Add(p);
                     prefab.CreateMaterial(GalaxyPrefab, GPU);
@@ -102,7 +123,7 @@ namespace Galaxia
             }
         }
         /// <summary>
-        /// Destroys all the Particles components in the Galaxy.
+        /// Destroys all the <see cref="Galaxia.Particles"/> components in the Galaxy.
         /// </summary>
         public void DestroyParticles()
         {
@@ -110,12 +131,12 @@ namespace Galaxia
 
             if (particles != null)
             {
-                for (int i = 0; i < particles.Count; i++)
+                foreach (Particles t in particles)
                 {
-                    particles[i].Destroy();
+					t?.Destroy();
                 }
 
-                particles.Clear();
+	            particles.Clear();
 
                 foreach(Transform t in transform)
                 {
@@ -128,20 +149,18 @@ namespace Galaxia
             }
         }
         /// <summary>
-        /// Destroys all <see name="Particles" cref="T:Galaxia.Particles"/> with a given prefab.
+        /// Destroys all <see cref="Galaxia.Particles"/> with a given prefab.
         /// </summary>
-        /// <param name="prefab" type="T:Galaxia.ParticlesPrefab">particle prefab to search for</param>
+        /// <param name="prefab">particle prefab to search for</param>
         public void DestroyParticles(ParticlesPrefab prefab)
         {
             if (particles != null)
             {
                 for (int i = 0; i < particles.Count;i++ )
                 {
-                    if (particles[i] != null && particles[i].Prefab == prefab)
-                    {
-                        particles[i].Destroy();
-                        particles.RemoveAt(i);
-                    }
+	                if (!particles[i] || particles[i].Prefab != prefab) continue;
+	                particles[i].Destroy();
+	                particles.RemoveAt(i);
                 }
             }
             else
@@ -151,20 +170,15 @@ namespace Galaxia
         }
 
         /// <summary>
-        /// Marks all the <see name="Particles" cref="T:Galaxia.Particles"/> for Update, next frame.
+        /// Marks all the <see cref="Galaxia.Particles"/> for Update, next frame.
         /// </summary>
         public void UpdateParticles()
         {
-            //Debug.Log("Updating particles");
+			GalaxyPrefab?.Distributor.RecreateCurves();
 
-            if(GalaxyPrefab != null)
+			foreach (Particles particle in particles)
             {
-                GalaxyPrefab.Distributor.RecreateCurves();
-            }
-
-            foreach(Particles particle in particles)
-            {
-                if(GalaxyPrefab != null)
+                if(particle && GalaxyPrefab != null)
                 {
                     particle.NeedsUpdate = true;
                 } 
@@ -172,36 +186,29 @@ namespace Galaxia
         }
 
 		/// <summary>
-		/// Forces all <see name="Particles" cref="T:Galaxia.Particles"/> to update Immediately
+		/// Forces all <see cref="Galaxia.Particles"/> to update Immediately
 		/// </summary>
 		public void UpdateParticlesImmediately()
         {
-            //Debug.Log("Updating particles");
-
-            if (GalaxyPrefab != null)
-            {
-                GalaxyPrefab.Distributor.RecreateCurves();
-            }
-
-            foreach (Particles particle in particles)
+			GalaxyPrefab?.Distributor.RecreateCurves();
+			foreach (Particles particle in particles)
             {
                 if (GalaxyPrefab != null)
                 {
-                    //particle.Prefab.CreateMaterial(GalaxyPrefab,DirectX11);
-                    particle.UpdateParticles();
+                    particle?.UpdateParticles();
                 }
             }
         }
 
-        /// <summary>
-        /// Marks a <see name="Particles Component" cref="T:Galaxia.Particles"/> with a given <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> for Update, next frame.
-        /// </summary>
-        /// <param name="prefab">The ParticlesPrefab to search for</param>
-        public void UpdateParticles(ParticlesPrefab prefab)
+		/// <summary>
+		/// Marks a <see cref="Galaxia.Particles"/> with a given <see cref="Galaxia.ParticlesPrefab"/> for Update, next frame.
+		/// </summary>
+		/// <param name="prefab">The <see cref="Galaxia.ParticlesPrefab"/> to search for</param>
+		public void UpdateParticles(ParticlesPrefab prefab)
         {
             foreach (Particles particle in particles)
             {
-                if (m_galaxy != null && particle.Prefab == prefab)
+                if (particle && m_galaxy != null && particle.Prefab == prefab)
                 {
                     particle.NeedsUpdate = true;
                 }
@@ -209,14 +216,14 @@ namespace Galaxia
         }
 
 		/// <summary>
-		/// Forces all <see name="Particles Component" cref="T:Galaxia.Particles"/> with a given <see name="Particles Prefab" cref="T:Galaxia.ParticlesPrefab"/> to update Immediately.
+		/// Forces all <see cref="Galaxia.Particles"/> with a given <see cref="Galaxia.ParticlesPrefab"/> to update Immediately.
 		/// </summary>
-		/// <param name="prefab">The ParticlesPrefab to search for</param>
+		/// <param name="prefab">The <see cref="Galaxia.ParticlesPrefab"/> to search for</param>
 		public void UpdateParticlesImmediately(ParticlesPrefab prefab)
         {
             foreach (Particles particle in particles)
             {
-                if (m_galaxy != null && particle.Prefab == prefab)
+                if (particle && m_galaxy != null && particle.Prefab == prefab)
                 {
                     particle.UpdateParticles();
                 }
@@ -230,41 +237,62 @@ namespace Galaxia
             {
                 foreach (Particles particle in particles)
                 {
-                    if (particle != null)
+                    if (particle)
                     {
-                        particle.Prefab.UpdateMaterialAnimation(GalaxyPrefab, 0, false);
-                        particle.Prefab.UpdateMaterial(GalaxyPrefab);
+                        particle.UpdateMaterials();
                         GalaxyPrefab.Distributor.UpdateMaterial(particle.Prefab.Material);
                     }
                     else
                     {
                         Debug.LogWarning("Particle Component was destroyed");
+						GenerateParticles();
+						return;
                     }
                     
                 }
             }
         }
-        /// <summary>
-        /// Draws the Galaxy and all the <see name="Particles" cref="T:Galaxia.Particles"/> in the Galaxy Now
-        /// </summary>
-        public void DrawNow()
+
+		/// <summary>
+		/// Called by unity when the object is drawn by any camera.
+		/// This method is the main rendering method for the galaxy.
+		/// It will not be called if the component is disabled or the Pre render event is used.
+		/// </summary>
+	    private void OnRenderObject()
+	    {
+		    foreach (var particle in particles)
+		    {
+				if(!particle) continue;
+				lastPreRenderEvent.Used = false;
+                m_preRenderHandler.Invoke(particle, lastPreRenderEvent);
+			    if (!lastPreRenderEvent.Used)
+			    {
+					particle.Render();
+				}
+		    }
+	    }
+
+		/// <summary>
+		/// Draws the Galaxy and all the <see cref="Galaxia.Particles"/> in the Galaxy Now
+		/// </summary>
+		public void DrawNow()
         {
             if (GalaxyPrefab != null && GPU)
             {
                 foreach (Particles particle in particles)
                 {
-                    if(particle != null)
+                    if(particle)
                     {
-                        particle.Prefab.UpdateMaterialAnimation(GalaxyPrefab, 0, false);
+						particle.UpdateMaterials();
 
-                        if (particle != null && particle.Prefab != null)
+                        if (particle.Prefab != null)
                             particle.DrawNow();
                     }
                 }
             }
         }
         /// <summary>
-        /// Sends the Galaxy and all the <see name="Particles" cref="T:Galaxia.Particles"/> for Rendering
+        /// Sends the Galaxy and all the <see cref="Galaxia.Particles"/> for Rendering
         /// </summary>
         public void Draw()
         {
@@ -272,33 +300,67 @@ namespace Galaxia
             {
                 foreach (Particles particle in particles)
                 {
-                    particle.Prefab.UpdateMaterialAnimation(GalaxyPrefab, 0, false);
-                    if (particle != null && particle.Prefab != null)
+                    if (particle && particle.Prefab != null)
                         particle.Draw();
                 }
             }
         }
 
-        
+	    /// <summary>
+	    /// </summary>
+	    private void OnDrawGizmosSelected()
+	    {
+			Bounds? bounds = null;
+			foreach (var particle in particles)
+			{
+				if(!particle) continue;
+				Bounds? particleBounds = particle.RenderBounds;
+				if (!particleBounds.HasValue) continue;
+				if (!bounds.HasValue)
+				{
+					bounds = particleBounds;
+				}
+				else
+				{
+					bounds.Value.Encapsulate(particleBounds.Value);
+				}
+			}
+			if (bounds.HasValue)
+			{
+				bounds = transform.TransformBounds(bounds.Value);
+				Gizmos.color = new Color(0.7f,0.8f,1,0.5f);
+                Gizmos.DrawWireCube(bounds.Value.center, bounds.Value.size);
+			}
+		}
 
-        #endregion
-        #region Getters And Setters
+	    /// <summary>
+	    /// </summary>
+	    private void OnDrawGizmos()
+	    {
+		    if (!Application.isPlaying && m_render_galaxy)
+		    {
+				DrawNow();
+			}
+	    }
+
+		#endregion
+		#region Getters And Setters
+		/// <summary>
+		/// A Utility function for getting the position of the <see cref="Galaxia.Galaxy"/>.
+		/// </summary>
+		public Vector3 Position { get { return transform.position; } set { transform.position = value; } }
         /// <summary>
-        /// A Utility function for getting the position of the Galaxy Component.
-        /// </summary>
-        public Vector3 Position { get { return transform.position; } set { transform.position = value; } }
-        /// <summary>
-        /// List of <see name="Particles" cref="T:Galaxia.Particles"/> that holds the Components responsible for the individual visualization of the <see name="Particle Prefabs" cref="T:Galaxia.ParticlesPrefabs"/>.
+        /// List of <see cref="Galaxia.Particles"/> that holds the Components responsible for the individual visualization of the <see cref="Galaxia.ParticlesPrefab"/>.
         /// </summary>
         public List<Particles> Particles { get { return particles; } }
-        /// <summary>
-        /// This dictates if the <see name="Galaxy" cref="T:Galaxia.Galaxy"/> updates automatically when a Property is changed.
-        /// If it is set to manual, <see name="GenerateParticles()" cref="M:Galaxia.Galaxy.GenerateParticles"/> or <see name="UpdateParticles()" cref="M:Galaxia.Galaxy.UpdateParticles"/> must be called every time the galaxy is changed.
-        /// </summary>
-        public GalaxyGenerationType GenerationType { get { return m_generationType; } set { m_generationType = value; } }
+		/// <summary>
+		/// This dictates if the <see cref="Galaxia.Galaxy"/> updates automatically when a Property is changed.
+		/// If it is set to manual, <see cref="Galaxia.Galaxy.GenerateParticles()"/> or <see cref="Galaxia.Galaxy.UpdateParticles(ParticlesPrefab)"/> must be called every time the galaxy is changed.
+		/// </summary>
+		public GalaxyGenerationType GenerationType { get { return m_generationType; } set { m_generationType = value; } }
         /// <summary>
         /// The meat of the galaxy. This is a holder for galaxy specific particle properties.
-        /// It holds a list of <see name="Particle Prefabs" cref="T:Galaxia.ParticlesPrefab"/> as well as the <see name="Distributor" cref="T:Galaxia.ParticleDistributor"/>.
+        /// It holds a list of <see cref="Galaxia.ParticlesPrefab"/> as well as the <see cref="Galaxia.ParticleDistributor"/>.
         /// </summary>
         public GalaxyPrefab GalaxyPrefab
         {
@@ -342,32 +404,128 @@ namespace Galaxia
                 if (m_gpu != value)
                 {
                     m_gpu = value;
+	                if (!m_gpu)
+	                {
+		                foreach (var particle in particles)
+		                {
+			                particle?.CleanMeshes();
+		                }
+	                }
                     if (m_generationType == GalaxyGenerationType.Automatic)
                         GenerateParticles();
                 }
             }
         }
-        /// <summary>
+
+		/// <summary>
+		/// Should the Generated meshes be saved in the scene or prefab.
+		/// This only works with GPU particles. As they generated meshes.
+		/// </summary>
+	    public bool SaveMeshes
+	    {
+		    get { return m_saveMeshes; }
+		    set
+		    {
+			    if (m_saveMeshes == value) return;
+			    m_saveMeshes = value;
+			    foreach (var particle in particles)
+			    {
+				    particle?.ForceUpdateParticles();
+			    }
+		    }
+	    }
+
+		/// <summary>
+		/// Should the Generated Particles be saved in the scene or prefab.
+		/// This works with all particles, as it saves the data.
+		/// </summary>
+		public bool SaveParticles
+		{
+			get { return m_saveParticles; }
+			set
+			{
+				if (m_saveParticles == value) return;
+				m_saveParticles = value;
+				foreach (var particle in particles)
+				{
+					particle?.ForceUpdateParticles();
+				}
+			}
+		}
+
+		/// <summary>
+		/// Should the galaxy be rendered. This disables the automatic rendering of the galaxy and does not disable the <see cref="Galaxia.Galaxy.Draw()"/> and <see cref="Galaxia.Galaxy.DrawNow()"/> methods.
+		/// </summary>
+		public bool RenderGalaxy
+	    {
+		    get { return m_render_galaxy; }
+		    set
+		    {
+			    if (m_render_galaxy == value) return;
+			    m_render_galaxy = value;
+			    foreach (var particle in particles)
+			    {
+				    particle?.UpdateRenderer();
+			    }
+		    }
+	    }
+
+		/// <summary>
+		/// Enable FrustumCulling.
+		/// This determines if the galaxy is rendered when outside the camera's frustum. This only applies to the GPU particles and not the Unity ones.
+		/// </summary>
+	    public bool FrustumCulling
+	    {
+		    get { return m_frustumCulling; }
+			set { m_frustumCulling = value; }
+	    }
+
+		/// <summary>
+		/// Returns the last pre-render event
+		/// </summary>
+	    public RenderEvent LastPreRenderEvent => lastPreRenderEvent;
+
+	    /// <summary>
         /// Checks if the currently utilized Graphics API is OpenGL instead of DirectX
         /// </summary>
-        public static bool OpenGL
-        {
-            get { return SystemInfo.graphicsDeviceVersion.Contains("OpenGL"); }
-        }
-        /// <summary>
+        public static bool OpenGL => SystemInfo.graphicsDeviceVersion.Contains("OpenGL");
+
+	    /// <summary>
         /// Checks if the DirectX is the current Graphics API and if so then is it >= than DX11
         /// </summary>
-        public static bool SupportsDirectX11
-        {
-            get { return !OpenGL && SystemInfo.graphicsShaderLevel >= 40; }
-        }
+        public static bool SupportsDirectX11 => !OpenGL && SystemInfo.graphicsShaderLevel >= 40;
 
-        #endregion
-        #region enums
-        /// <summary>
-        /// Used for specifying the Galaxy Particle Generation Type.
-        /// </summary>
-        public enum GalaxyGenerationType
+		/// <summary>
+		/// A utility method for setting the time of all <see cref="Galaxia.Particles"/> on the <see cref="Galaxia.Galaxy"/>.
+		/// Used mainly for animations.
+		/// </summary>
+		/// <param name="time">The time of the particles.</param>
+		public void SetParticlesTime(float time)
+		{
+			foreach (var particle in particles)
+			{
+				if(particle)
+					particle.Time = time;
+			}
+		}
+
+		/// <summary>
+		/// On Pre Render Event Handler. This is called before each <see cref="Galaxia.Particles"/> is rendered.
+		/// If this event is used then the <see cref="Galaxia.Particles"/> won't be rendered.
+		/// </summary>
+		public RenderEventHandler OnPreRender => m_preRenderHandler ?? (m_preRenderHandler = new RenderEventHandler());
+
+		/// <summary>
+		/// On Post Render Event Handler. This is called after each <see cref="Galaxia.Particles"/> is rendered.
+		/// </summary>
+		public RenderEventHandler OnPostRender => m_postRenderHandler ?? (m_postRenderHandler = new RenderEventHandler());
+
+		#endregion
+		#region enums
+		/// <summary>
+		/// Used for specifying the Galaxy Particle Generation Type.
+		/// </summary>
+		public enum GalaxyGenerationType
         {
             /// <summary>
             /// generates particles when the Galaxy Prefab properties change.
@@ -378,20 +536,24 @@ namespace Galaxia
             /// </summary>
             Manual
         }
-
-		/// <summary>
-		/// A utility method for setting the time of all Particles on the Galaxy.
-		/// Used mainly for animations.
-		/// </summary>
-		/// <param name="time">The time of the particles.</param>
-	    public void SetParticlesTime(float time)
-	    {
-		    foreach (Particles particle in particles)
-		    {
-			    particle.Time = time;
-		    }
-	    }
         #endregion
 
+		public class RenderEvent
+		{
+			public bool Used;
+
+			public RenderEvent(bool used)
+			{
+				Used = used;
+			}
+		}
+
+		/// <summary>
+		/// Render Event Implementation
+		/// </summary>
+		public class RenderEventHandler : UnityEvent<Particles, RenderEvent>
+		{
+			 
+		}
     }
 }

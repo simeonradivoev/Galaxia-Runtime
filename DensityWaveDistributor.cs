@@ -1,41 +1,51 @@
-﻿using UnityEngine;
+﻿// ----------------------------------------------------------------
+// Galaxia
+// ©2016 Simeon Radivoev
+// Written by Simeon Radivoev (simeonradivoev@gmail.com)
+// ----------------------------------------------------------------
+using UnityEngine;
 
 namespace Galaxia
 {
-    public sealed class DensityWaveDistributor : ParticleDistributor
+	/// <summary>
+	/// The Density Wave Distribution Algorithm
+	/// http://simeon.co.vu/Documentation/Galaxia/custom_distributors.html
+	/// </summary>
+	public sealed class DensityWaveDistributor : ParticleDistributor
     {
         #region Private
-        [SerializeField]
+        [SerializeField, Delayed]
         private float periapsisDistance = 0.08f;
-        [SerializeField]
+        [SerializeField, Delayed]
         private float apsisDistance = 0.01f;
-        [SerializeField]
+        [SerializeField, Delayed]
         private float CenterMass = 830000;
-        [SerializeField]
+        [SerializeField, Delayed]
         private float StarMass = 80;
-        [SerializeField]
+        [SerializeField, Delayed]
         private float FocalPoint = -1;
-        [SerializeField]
+        [SerializeField, Delayed]
         private float angleOffset = 8;
-        [SerializeField]
+        [SerializeField, Delayed]
         private float m_heightVariance = 1;
         [SerializeField]
         [CurveRange(0, 0, 1, 1)]
         private AnimationCurve m_galaxyHeightMultiply = DefaultResources.HeightCurve;
-        #endregion
-        
+		#endregion
 
-        /// <summary>
-        /// The main function for star orbits in the galaxy.
-        /// It also calculates the color of each particle
-        /// </summary>
-        /// <param name="_particle">The particle to use, to calculate it's position</param>
-        /// <param name="galaxy">The GalaxyPrefab that holds all the information on the galaxy generation</param>
-        /// <param name="particles">The ParticlePrefab that holds the information on the particle itself</param>
-        /// <param name="center">The local center of the galaxy. It is advised to use the transform of the galaxy to move it</param>
-        /// <param name="angleRotation">the global rotation for all the particles a.k.a. the time</param>
-        /// <param name="index">the index of the particle</param>
-        public override void Process(ProcessContext context)
+
+		/// <summary>
+		/// The main function for star orbits in the galaxy.
+		/// It also calculates the color of each particle
+		/// http://simeon.co.vu/Documentation/Galaxia/custom_distributors.html
+		/// </summary>
+		/// <param name="_particle">The particle to use, to calculate it's position</param>
+		/// <param name="galaxy">The <see cref="Galaxia.GalaxyPrefab"/> that holds all the information on the galaxy generation</param>
+		/// <param name="particles">The ParticlePrefab that holds the information on the particle itself</param>
+		/// <param name="center">The local center of the galaxy. It is advised to use the transform of the galaxy to move it</param>
+		/// <param name="angleRotation">the global rotation for all the particles a.k.a. the time</param>
+		/// <param name="index">the index of the particle</param>
+		public override void Process(ProcessContext context)
         {
             float dis = context.particles.PositionDistribution.Evaluate(context.index / (float)context.particles.Count);
             context.particle.index = (float)context.particles.Count * dis;

@@ -1,15 +1,24 @@
-﻿//#define HIDE_SUB_ASSETS
+﻿// ----------------------------------------------------------------
+// Galaxia
+// ©2016 Simeon Radivoev
+// Written by Simeon Radivoev (simeonradivoev@gmail.com)
+// ----------------------------------------------------------------
+#define EDIT_RESOURCES
+#define HIDE_SUB_ASSETS
+
+using System;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.Rendering;
 
 namespace Galaxia
 {
-    /// <summary>
-    /// This is the component class that holds the galaxy meshes and handles the visualization of the particles.
-    /// This is the main connection between Galaxia and Unity.
-    /// </summary>
-    [System.Serializable]
+	/// <summary>
+	/// This is the component class that holds the generated particles.
+	/// It also hold the Unity's particle system object when CPU particles are active.
+	/// This is the main connection between Galaxia and Unity.
+	/// </summary>
+	[System.Serializable]
     public sealed class Particles : MonoBehaviour
     {
         #region Constants
@@ -39,7 +48,16 @@ namespace Galaxia
         private bool m_needsRebuild = true;
         private bool m_needsUpdate = true;
 	    private float m_time = 0;
+		[SerializeField, HideInInspector]
+	    private Color m_overlayColor = Color.white;
+	    private Material m_suruken_material;
+	    private Bounds? m_renderBounds;
         #endregion
+
+		internal void Init()
+		{
+			UpdateHideFlags();
+		}
 
         /// <summary>
         /// Generate the particle data as well as the mesh
@@ -62,11 +80,12 @@ namespace Galaxia
             {
                 if(m_needsRebuild)
                 {
-                    Prefab.UpdateMaterial();
+                    Prefab.UpdateMaterial(m_overlayColor);
                     Build();
                     m_needsRebuild = false;
                 }
-                else if(m_needsUpdate)
+
+                if(m_needsUpdate)
                 {
                     m_needsUpdate = false;
                 }
@@ -75,17 +94,36 @@ namespace Galaxia
             }
         }
 
-        void OnRenderObject()
+		/// <summary>
+		/// Used for rendering Internally by the <see cref="Galaxia.Galaxy"/> Component
+		/// It Does frustum culling if enabled
+		/// </summary>
+        internal void Render()
         {
-            if (GalaxyPrefab != null && Galaxy != null && Camera.current && Camera.current.cullingMask == (Camera.current.cullingMask | (1 << gameObject.layer)))
-            {
-                DrawNow();
-            }
-        }
+	        if (GalaxyPrefab == null || Galaxy == null) return;
+	        if (!Galaxy.GPU) return;;
+			//Draw the galaxy and take into account it's gameObject layer
+			//This allow for Camera layer culling to work properly
+	        if (!Galaxy.RenderGalaxy || !Camera.current || Camera.current.cullingMask != (Camera.current.cullingMask | (1 << gameObject.layer))) return;
+	        if (Galaxy.FrustumCulling)
+	        {
+		        Plane[] planes = GeometryUtility.CalculateFrustumPlanes(Camera.current);
+		        if (RenderBounds.HasValue)
+		        {
+			        if (GeometryUtility.TestPlanesAABB(planes, transform.TransformBounds(RenderBounds.Value)))
+			        {
+				        DrawNow();
+			        }
+					return;
+		        }
+	        }
+
+			DrawNow();
+		}
 
 
         /// <summary>
-        /// Rebuilds the renderers with the generated mesh
+        /// Rebuilds the renderers.
         /// if the system doesn't not support geometry shades it will build it with unity's particle system
         /// </summary>
         internal void Build()
@@ -98,36 +136,101 @@ namespace Galaxia
                     GameObject g = new GameObject("Shuriken Renderer", typeof(ParticleSystem));
                     g.transform.parent = transform;
                     ParticleSystem system = g.GetComponent<ParticleSystem>();
-                    system.maxParticles = m_prefab.Count;
-                    system.playOnAwake = false;
-                    Renderer renderer = system.GetComponent<Renderer>();
+					system.maxParticles = m_prefab.Count;
+					system.playOnAwake = false;
+	                system.startSpeed = 0;
+					//emission Module
+					ParticleSystem.EmissionModule emissionModule = system.emission;
+	                emissionModule.enabled = false;
+					//rendrer
+					ParticleSystemRenderer renderer = system.GetComponent<ParticleSystemRenderer>();
                     renderer.material = Resources.Load<Material>("Materials/ParticleSystemParticle");
                     renderer.material.mainTexture = m_prefab.Texture;
                     renderer.shadowCastingMode = ShadowCastingMode.On;
                     renderer.receiveShadows = false;
-                    system.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
-                    system.Stop();
-                    m_renderers[0] = g;
+	                m_suruken_material = renderer.material;
+                    system.SetParticles(ParticleList.Select(p => Particle.ConvertToParticleSystem(p,m_prefab.TextureSheetPow)).ToArray(), m_particleList.Length);
+					//multiplying it by 10 fixed the size differences between Unity's particle System and the Custom Mesh Particles
+					renderer.maxParticleSize = m_prefab.MaxScreenSize * 10;
+					//animation module
+					ParticleSystem.TextureSheetAnimationModule textureSheetAnimation = system.textureSheetAnimation;
+					textureSheetAnimation.enabled = true;
+                    textureSheetAnimation.numTilesX = m_prefab.TextureSheetPow;
+					textureSheetAnimation.numTilesY = m_prefab.TextureSheetPow;
+					system.Pause();
+					m_renderers[0] = g;
                 }
-            }
-        }
+				//Generation of Mesh Renderer to use meshes on, makes the galaxy always visible behind scene objects
+				//using Draw Now solves that Issue
+				/*else
+                {
+					
+					
+	                m_renderers = new GameObject[m_meshes.Length];
+	                for (int i = 0; i < m_meshes.Length; i++)
+	                {
+		                GameObject g = new GameObject("Mesh Renderer",new Type[] {typeof(MeshRenderer),typeof(MeshFilter)});
+#if HIDE_SUB_ASSETS
+						g.hideFlags = HideFlags.HideInHierarchy | HideFlags.NotEditable;
+#endif
+						Renderer renderer = g.GetComponent<Renderer>();
+		                renderer.sharedMaterial = Prefab.Material;
+		                MeshFilter meshFilter = g.GetComponent<MeshFilter>();
+		                meshFilter.sharedMesh = m_meshes[i];
+						g.transform.SetParent(transform,false);
+		                m_renderers[i] = g;
+	                }
+			}*/
+			}
+		}
+
+		private void UpdateHideFlags()
+		{
+			gameObject.hideFlags = Galaxy.SaveParticles ? HideFlags.None : HideFlags.HideAndDontSave;
+#if HIDE_SUB_ASSETS
+			gameObject.hideFlags |= HideFlags.HideInHierarchy;
+#endif
+#if EDIT_RESOURCES
+			gameObject.hideFlags |= HideFlags.NotEditable;
+#endif
+		}
 
 		/// <summary>
 		/// Used to forcefully update the particles
 		/// </summary>
-	    public void ForceUpdateParticles()
+		public void ForceUpdateParticles()
 	    {
 		    UpdateParticles();
 	    }
 
+		/// <summary>
+		/// Used to update the prefab material used by the GPU particles.
+		/// It also updates the material for the Unity particle system if CPU particles are enabled.
+		/// </summary>
+	    internal void UpdateMaterials()
+		{
+		    if (Prefab == null) return;
+		    Prefab.UpdateMaterialAnimation(GalaxyPrefab, 0, false);
+			Prefab.UpdateMaterial(GalaxyPrefab,m_overlayColor);
+		    if (m_suruken_material)
+		    {
+			    m_suruken_material.color = OverlayColor * Prefab.ColorOverlay;
+		    }
+		}
+
+		/// <summary>
+		/// Updates all the particles by redistributing them.
+		/// It also assign the particle data to the meshes or the Unity's particle system.
+		/// </summary>
         internal void UpdateParticles()
         {
             if (m_prefab != null)
             {
                 UpdateRenderer();
                 UpdateParticleList();
+				UpdateHideFlags();
 
-                if(m_gpu)
+				if (m_gpu)
                     UpdateMeshes();
                 else
                     UpdateShuriken();
@@ -140,17 +243,17 @@ namespace Galaxia
             }
         }
 
-        /// <summary>
-        /// Draws the generated particles meshes now.
-        /// This is function <see cref="Graphics.DrawMeshNow"/>
-        /// </summary>
-        public void DrawNow()
+		/// <summary>
+		/// Draws the generated particles meshes now.
+		/// </summary>
+		public void DrawNow()
         {
             if (m_gpu)
             {
+	            if (m_meshes == null) return;
                 foreach (Mesh m in m_meshes)
                 {
-                    if (m == null || m_meshes == null)
+                    if (m == null)
                     {
                         UpdateMeshes();
                     }
@@ -159,7 +262,6 @@ namespace Galaxia
                     {
                         if (m_prefab.Material.SetPass(0))
                         {
-                            m_prefab.UpdateMaterial(m_galaxyPrefab);
                             Graphics.DrawMeshNow(m, transform.parent.localToWorldMatrix);
                         }
                     }
@@ -175,28 +277,57 @@ namespace Galaxia
         {
             if (m_gpu)
             {
-                if (m_meshes == null)
-                    UpdateMeshes();
+	            if (m_meshes == null) return;
+	            foreach (Mesh m in m_meshes)
+	            {
+		            if (m == null)
+		            {
+			            UpdateMeshes();
+		            }
 
-                foreach (Mesh m in m_meshes)
-                {
-                    if (m == null)
-                    {
-                        UpdateMeshes();
-                    }
+		            if (m != null && m_prefab.active)
+		            {
+			            //if(Galaxy.DirectX11)
+			            //    Prefab.Material.shader = GalaxyPrefab.shader;
+			            //else
+			            //    Prefab.Material.shader = GalaxyPrefab.shaderCPU;
 
-                    if (m != null && m_prefab.active)
-                    {
-                        //if(Galaxy.DirectX11)
-                        //    Prefab.Material.shader = GalaxyPrefab.shader;
-                        //else
-                        //    Prefab.Material.shader = GalaxyPrefab.shaderCPU;
-
-                        Graphics.DrawMesh(m, transform.localToWorldMatrix, m_prefab.Material, 8);
-                    }
-                }
+			            Graphics.DrawMesh(m, transform.localToWorldMatrix, m_prefab.Material, Galaxy.gameObject.layer);
+		            }
+	            }
             }
         }
+
+		/// <summary>
+		/// Draws the particle meshes to a given Command buffer.
+		/// </summary>
+		/// <param name="buffer">The Command buffer to draw into.</param>
+		public void Draw(CommandBuffer buffer)
+	    {
+			if (m_gpu)
+			{
+				if (m_meshes == null)
+					UpdateMeshes();
+
+				foreach (Mesh m in m_meshes)
+				{
+					if (m == null)
+					{
+						UpdateMeshes();
+					}
+
+					if (m != null && m_prefab.active)
+					{
+						//if(Galaxy.DirectX11)
+						//    Prefab.Material.shader = GalaxyPrefab.shader;
+						//else
+						//    Prefab.Material.shader = GalaxyPrefab.shaderCPU;
+
+						buffer.DrawMesh(m,transform.localToWorldMatrix,m_prefab.Material,Galaxy.gameObject.layer);
+					}
+				}
+			}
+		}
 
         int MeshCount(int Count)
         {
@@ -213,12 +344,91 @@ namespace Galaxia
         /// </summary>
         void UpdateMeshes()
         {
+			//Destroys meshes if they are incompatible with Rendering API
+			if(CalculateNeedsMeshRebuild())
+				DestoryMeshes();
+
             if (Galaxy.SupportsDirectX11)
                 UpdateMeshesNormal();
             else
                 UpdateMeshesBruteForce();
+
+	        CalculateBounds();
         }
 
+		public bool CalculateNeedsUpdate()
+		{
+			if (CalculateNeedsMeshRebuild()) return true;
+			if (m_meshes == null) return true;
+			return m_meshes.Any(t => t == null);
+		}
+
+		/// <summary>
+		/// Check if the generated meshes do not match the current rendering API
+		/// Open GL and Non-DirectX11 meshes use the brute force and have a quad topology
+		/// DirectX11 meshes use the normal (Geometry Shader) way and have a point topology
+		/// </summary>
+		/// <returns></returns>
+		internal bool CalculateNeedsMeshRebuild()
+		{
+			if(!Galaxy.GPU) return false;
+			if (m_meshes == null || CheckMeshesNulls() || m_meshes.Any(m => m.hideFlags != (Galaxy.SaveMeshes ? HideFlags.HideInInspector : HideFlags.HideAndDontSave))) return true;
+			if (!Galaxy.SupportsDirectX11)
+			{
+				return m_meshes.Any(m => m.GetTopology(0) != MeshTopology.Quads);
+			}
+
+			return m_meshes.Any(m => m.GetTopology(0) != MeshTopology.Points);
+		}
+
+		private bool CheckMeshesNulls()
+		{
+			return m_meshes.Any(t => t == null);
+		}
+
+		/// <summary>
+		/// Calculates the mesh or the Unity particle System bounds and stores them in a cache.
+		/// It can be accessed by <see cref="Particles.RenderBounds"/>.
+		/// </summary>
+	    private void CalculateBounds()
+	    {
+		    m_renderBounds = null;
+		    if (!Galaxy.GPU)
+		    {
+			    if (Renderers == null) return;
+			    foreach (var r in Renderers)
+			    {
+					if (m_renderBounds == null)
+					{
+						m_renderBounds = r.GetComponent<Renderer>().bounds;
+					}
+					else
+					{
+						m_renderBounds.Value.Encapsulate(r.GetComponent<Renderer>().bounds);
+					}
+			    }
+		    }
+		    else
+		    {
+			    if (m_meshes == null) return;
+				foreach (var mesh in m_meshes)
+				{
+					if (m_renderBounds == null)
+					{
+						m_renderBounds = mesh.bounds;
+					}
+					else
+					{
+						m_renderBounds.Value.Encapsulate(mesh.bounds);
+					}
+				}
+			}
+	    }
+
+		/// <summary>
+		/// This method updates the meshes by assigning points to the mesh.
+		/// This is used when Geometry Shaders are enabled. The Geometry shader generates the camera facing quads.
+		/// </summary>
         void UpdateMeshesNormal()
         {
             int meshCount = MeshCount(m_prefab.Count);
@@ -226,7 +436,7 @@ namespace Galaxia
 
             Random.seed = m_prefab.Seed;
 
-            for (int i = 0; i < m_meshes.Length; i++)
+            for (int i = 0; i < meshCount; i++)
             {
                 int size = UpdateMeshBase(i, meshCount, m_prefab.Count);
 
@@ -243,7 +453,7 @@ namespace Galaxia
                     color[e] = m_particleList[particleIndex].color;
                     info[e].x = m_particleList[particleIndex].size;
                     info[e].y = m_particleList[particleIndex].rotation;
-                    sheetPos[e].x = Random.Next(0, (int)Mathf.Pow(Prefab.TextureSheetPow, 2));
+                    sheetPos[e].x = Random.Next(0, Prefab.TextureSheetPow* Prefab.TextureSheetPow);
                     indexes[e] = e;
                 }
 
@@ -256,7 +466,11 @@ namespace Galaxia
             }
         }
 
-        void UpdateMeshesBruteForce()
+		/// <summary>
+		/// This method generates quads and populates the mesh.
+		/// It is used when Geometry shaders are not supported and quads cannot be generated by the GPU.
+		/// </summary>
+		void UpdateMeshesBruteForce()
         {
             int meshCount = MeshCountCPU(m_prefab.Count);
             UpdateMeshesBase(meshCount);
@@ -280,18 +494,21 @@ namespace Galaxia
                     color[e] = m_particleList[particleIndex].color;
                     info[e].x = m_particleList[particleIndex].size;
                     info[e].y = m_particleList[particleIndex].rotation;
-                    sheetPos[e].x = Random.Next(0, (int)Mathf.Pow(Prefab.TextureSheetPow, 2));
                     indexes[e] = e;
                 }
 
                 for (int e = 0; e < size; e+=4)
                 {
-                    int particleIndex = Mathf.FloorToInt((i * MAX_VERTEX_PER_MESH + e) / 4f);
+	                int sheetIndex = Random.Next(0, Prefab.TextureSheetPow * Prefab.TextureSheetPow);
                     normals[e] = new Vector3(-1,-1);
                     normals[e+1] = new Vector3(-1, 1);
                     normals[e+2] = new Vector3(1, 1);
                     normals[e+3] = new Vector3(1, -1);
-                }
+					sheetPos[e].x = sheetIndex;
+					sheetPos[e + 1].x = sheetIndex;
+					sheetPos[e + 2].x = sheetIndex;
+					sheetPos[e + 3].x = sheetIndex;
+				}
 
                 m_meshes[i].vertices = vertex;
                 m_meshes[i].colors = color;
@@ -303,6 +520,10 @@ namespace Galaxia
             }
         }
 
+		/// <summary>
+		/// This is a utility method that makes sure the meshes array is not empty and has enough space.
+		/// </summary>
+		/// <param name="MeshCount"></param>
         void UpdateMeshesBase(int MeshCount)
         {
             if (m_meshes == null)
@@ -316,41 +537,65 @@ namespace Galaxia
             }
         }
 
-        int UpdateMeshBase(int MeshIndex,int MeshCount,int ParicleCount)
+
+		/// <summary>
+		/// This is a utility method that initializes meshes if they are <c>null</c>.
+		/// </summary>
+		/// <param name="meshIndex">The index of the mesh.</param>
+		/// <param name="meshCount">The total mesh count.</param>
+		/// <param name="paricleCount">The total particle count.</param>
+		/// <returns></returns>
+        int UpdateMeshBase(int meshIndex,int meshCount,int paricleCount)
         {
             int size = MAX_VERTEX_PER_MESH;
-            if (MeshIndex == MeshCount - 1)
-                size = ParicleCount - MAX_VERTEX_PER_MESH * MeshIndex;
+            if (meshIndex == meshCount - 1)
+                size = paricleCount - MAX_VERTEX_PER_MESH * meshIndex;
 
-            if (m_meshes[MeshIndex] == null)
+            if (m_meshes[meshIndex] == null)
             {
-                m_meshes[MeshIndex] = new Mesh();
-                m_meshes[MeshIndex].hideFlags = HideFlags.HideAndDontSave;
-            }
-            else if (m_meshes[MeshIndex].vertexCount > size)
+                m_meshes[meshIndex] = new Mesh();
+			}
+            else if (m_meshes[meshIndex].vertexCount > size)
             {
-                m_meshes[MeshIndex].Clear(true);
+                m_meshes[meshIndex].Clear(true);
             }
 
-            return size;
+			m_meshes[meshIndex].hideFlags = Galaxy.SaveMeshes ? HideFlags.HideInInspector : HideFlags.HideAndDontSave;
+
+			return size;
         }
 
+		/// <summary>
+		/// Cleans (Destroys) old meshes.
+		/// </summary>
+	    internal void CleanMeshes()
+	    {
+		    m_renderBounds = null;
+			//clear old meshes that are no longer needed when using the Unity Particle System
+			if (m_meshes != null && (m_meshes != null || m_meshes.Length > 0))
+			{
+				DestoryMeshes();
+			}
+		}
+
+		/// <summary>
+		/// Updates the Unity Particle System with the generated particle data.
+		/// </summary>
         void UpdateShuriken()
         {
 	        if (Renderers == null) return;
             foreach(GameObject g in Renderers)
             {
                 ParticleSystem system = g.GetComponent<ParticleSystem>();
-                if (system != null)
-                {
-                    system.SetParticles(ParticleList.Select(p => (ParticleSystem.Particle)p).ToArray(), m_particleList.Length);
-                }
+                system?.SetParticles(ParticleList.Select(p => Particle.ConvertToParticleSystem(p,m_prefab.TextureSheetPow)).ToArray(), m_particleList.Length);
             }
+			CalculateBounds();
         }
+
         /// <summary>
         /// Update all parameters of the renderer
         /// </summary>
-        void UpdateRenderer()
+        internal void UpdateRenderer()
         {
 	        if (Renderers == null || Prefab == null) return;
 	        foreach (GameObject g in Renderers)
@@ -358,7 +603,7 @@ namespace Galaxia
 		        Renderer renderer = g.GetComponent<Renderer>();
 		        if(renderer != null)
 		        {
-			        renderer.enabled = Prefab.active;
+			        renderer.enabled = Prefab.active && Galaxy.RenderGalaxy;
 		        }
 	        }
         }
@@ -387,6 +632,7 @@ namespace Galaxia
 				{
 					m_particleList[i] = new Particle();
 					m_particleList[i].index = i;
+					m_particleList[i].sheetPosition = Random.Next(0, m_prefab.TextureSheetPow * m_prefab.TextureSheetPow);
 					m_galaxyPrefab.Distributor.Process(new ParticleDistributor.ProcessContext(m_particleList[i], m_galaxyPrefab, m_prefab, time, i));
 				}
 			}
@@ -420,35 +666,35 @@ namespace Galaxia
             GameObject.DestroyImmediate(gameObject);
         }
 
+		/// <summary>
+		/// Destroys all renderers
+		/// </summary>
         void DestroyRenderers()
         {
 	        if (m_renderers == null) return;
-	        foreach (GameObject renderer in m_renderers)
+	        foreach (GameObject r in m_renderers.Where(r => r != null))
 	        {
-		        if (renderer != null)
-		        {
-			        //GameObject.DestroyImmediate(renderer.GetComponent<MeshFilter>().sharedMesh, true);
-			        GameObject.DestroyImmediate(renderer);
-		        }
+		        GameObject.DestroyImmediate(r);
 	        }
 
 	        m_renderers = null;
         }
 
+		/// <summary>
+		/// Destroys all mesh data.
+		/// </summary>
         void DestoryMeshes()
         {
-            if (m_meshes != null)
-            {
-                foreach (Mesh m in m_meshes)
-                {
-                    DestroyImmediate(m, true);
-                }
+			if (m_meshes == null) return;
+			foreach (Mesh m in m_meshes)
+			{
+				DestroyImmediate(m, true);
+			}
 
-                m_meshes = null;
-            }
+			m_meshes = null;
         }
 
-        #region Getters and setters
+#region Getters and setters
         /// <summary>
         /// The Particles Prefab
         /// </summary>
@@ -484,15 +730,8 @@ namespace Galaxia
         /// The Particles component is attached to children objects added to the Main Game Object with the Galaxy component.
         /// The Children objects are hidden from the Unity's inspector.
         /// </summary>
-        public Galaxy Galaxy {
-            get {
-                if(transform.parent != null)
-                {
-                    return transform.parent.GetComponent<Galaxy>();
-                }
-                return null;
-            }
-        }
+        public Galaxy Galaxy => transform.parent?.GetComponent<Galaxy>();
+
 		/// <summary>
 		/// The Time of the particles.
 		/// Used manly for animations.
@@ -503,6 +742,31 @@ namespace Galaxia
 			set { m_time = value; }
 	    }
 
-	    #endregion
+		/// <summary>
+		/// The Overlay Color of the Particles. This color will be multiplied with the overlay color of the Particle Prefab
+		/// </summary>
+	    public Color OverlayColor
+	    {
+		    get { return m_overlayColor; }
+			set { m_overlayColor = value; }
+	    }
+
+		/// <summary>
+		/// The render bounds of the galaxy. This could be generated by the meshes of GPU particles or Unity's Particle system if CPU particles are implemented.
+		/// </summary>
+	    public Bounds? RenderBounds
+	    {
+		    get
+		    {
+			    if (m_renderBounds == null)
+			    {
+				    CalculateBounds();
+			    }
+			    return m_renderBounds; 
+			    
+		    }
+	    }
+
+#endregion
     }
 }

@@ -13,14 +13,13 @@ namespace Galaxia
         [SerializeField]
         [HideInInspector]
         private bool m_active = true;
-        [SerializeField]
+        [SerializeField, Delayed]
         private int m_count = 100000;
-        [SerializeField]
+        [SerializeField, Delayed]
         private int m_seed = 0;
-        [SerializeField]
+        [SerializeField,Delayed]
         private float m_size = 0.1f;
-        [SerializeField]
-        [Range(0,1)]
+        [SerializeField,Delayed, Range(0,1)]
         private float m_maxScreenSize = 0.1f;
         [Header("Distribution")]
         [CurveRange(0, 0, 1, 1)]
@@ -56,14 +55,15 @@ namespace Galaxia
         private UnityEngine.Rendering.BlendMode m_blendModeSrc = UnityEngine.Rendering.BlendMode.SrcAlpha;
         [SerializeField]
         private UnityEngine.Rendering.BlendMode m_blendModeDis = UnityEngine.Rendering.BlendMode.One;
-        [SerializeField]
+        [SerializeField, Delayed]
         private int m_renderQueue = 0;
         [SerializeField]
         private Texture2D m_texture;
-        [SerializeField]
+        [SerializeField, Delayed]
         private int m_textureSheetPower = 1;
-        [SerializeField]
-        [HideInInspector]
+		[SerializeField, Delayed]
+		private int m_downsample = 1;
+        [SerializeField,HideInInspector]
         private Color m_colorOverlay = UnityEngine.Color.white;
 
         #region hidden
@@ -172,10 +172,30 @@ namespace Galaxia
             UpdateMaterial(GalaxyPrefab);
         }
 
-        /// <summary>
-        /// Updates the Particles Prefab Internal material. With all the uniform variables from the given Galaxy Prefab.
-        /// </summary>
-        public void UpdateMaterial(GalaxyPrefab prefab)
+		/// <summary>
+		/// Updates the Particles Prefab Internal material. With all the uniform variables from it's galaxy prefab.
+		/// </summary>
+		/// <param name="color">The Overlay Color of the stars</param>
+		public void UpdateMaterial(Color color)
+		{
+			UpdateMaterial(GalaxyPrefab, color);
+		}
+
+		/// <summary>
+		/// Updates the Particles Prefab Internal material. With all the uniform variables from the given Galaxy Prefab.
+		/// </summary>
+		/// <param name="prefab">The Galaxy Prefab</param>
+		public void UpdateMaterial(GalaxyPrefab prefab)
+		{
+			UpdateMaterial(prefab, UnityEngine.Color.white);
+		}
+
+	    /// <summary>
+		/// Updates the Particles Prefab Internal material. With all the uniform variables from the given Galaxy Prefab.
+		/// </summary>
+		/// <param name="prefab">The Galaxy Prefab</param>
+		/// <param name="color">The overlay color of the stars</param>
+		public void UpdateMaterial(GalaxyPrefab prefab,Color color)
         {
             if (m_material == null)
             {
@@ -185,7 +205,7 @@ namespace Galaxia
             if (prefab != null && m_material != null)
             {
                 m_material.mainTexture = Texture;
-                m_material.color = m_colorOverlay;
+                m_material.color = m_colorOverlay * color;
                 m_material.SetFloat("MaxScreenSize", MaxScreenSize);
                 m_material.SetInt("TextureSheetPower", m_textureSheetPower);
                 m_material.SetInt("MySrcMode",(int)m_blendModeSrc);
@@ -284,7 +304,16 @@ namespace Galaxia
         /// The particle texture sheet power factor.
         /// </summary>
         public int TextureSheetPow { get { return m_textureSheetPower; } set { m_textureSheetPower = value; } }
-        /// <summary>
+		/// <summary>
+		/// The amount of down sample for the given particles when using the Advanced Galaxy Renderer
+		/// </summary>
+	    public int Downsample
+	    {
+		    get { return m_downsample; }
+		    set { m_downsample = value; }
+	    }
+
+	    /// <summary>
         /// The Size Distributor Property
         /// </summary>
         public DistributionProperty SizeDistributor

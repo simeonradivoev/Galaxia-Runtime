@@ -52,6 +52,8 @@
     <Compile Include="DistributionType.cs" />
     <Compile Include="FastRandom.cs" />
     <Compile Include="Galaxy.cs" />
+    <Compile Include="GalaxyRenderer.cs" />
+    <Compile Include="OffscreenGalaxyRenderer.cs" />
     <Compile Include="GalaxyPrefab.cs" />
     <Compile Include="GaussianDistributor.cs" />
     <Compile Include="ImageDistributor.cs" />
@@ -68,6 +70,7 @@
     <Compile Include="Random.cs" />
     <Compile Include="SimplexNoise.cs" />
     <Compile Include="StarFinder.cs" />
+    <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
