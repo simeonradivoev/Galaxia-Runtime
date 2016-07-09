@@ -9,20 +9,24 @@ namespace Galaxia
 {
 	/// <summary>
 	/// The Gaussian Distribution algorith.
-	/// This distributor resembles a star cluster.
 	/// </summary>
-    public class GaussianDistributor : ParticleDistributor
+	/// <remarks>
+	/// This distributor resembles a star cluster.
+	/// </remarks>
+	public class GaussianDistributor : ParticleDistributor
     {
         #region Private
         [SerializeField]
         private double m_variation = 1;
-        #endregion
+		#endregion
 
 		/// <summary>
 		/// Used by the Particle Generator to modify/distribute the particles to a desired shape.
+		/// </summary>
+		/// <remarks>
 		/// This is where particles are processed one by one.
 		/// <see cref="Galaxia.ParticleDistributor.ProcessContext"/>
-		/// </summary>
+		/// </remarks>
 		/// <param name="context">The context holds information on the current particle and Galaxy Object.</param>
 		public override void Process(ProcessContext context)
         {

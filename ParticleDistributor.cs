@@ -7,11 +7,13 @@ using UnityEngine;
 
 namespace Galaxia
 {
-    /// <summary>
-    /// The Particle Distributor is the base class for all Particle Distributors.
-    /// As it's name suggests, it is used to control the distribution of generated particles.
-    /// </summary>
-    public abstract class ParticleDistributor : ScriptableObject
+	/// <summary>
+	/// The Particle Distributor is the base class for all Particle Distributors.
+	/// </summary>
+	/// <remarks>
+	/// As it's name suggests, it is used to control the distribution of generated particles.
+	/// </remarks>
+	public abstract class ParticleDistributor : ScriptableObject
     {
         #region constants
         /// <summary>
@@ -96,12 +98,14 @@ namespace Galaxia
 
             return integral;
         }
-        /// <summary>
-        /// The context that holds all the data needed for particle distribution by any Particle Distributor.
-        /// This is used for customizing and pre processing particle properties for custom distributions.
-        /// Used in <see cref="ParticleDistributor.Process(ProcessContext)"/> and <see cref="ParticleDistributor.ProcessProperties(ProcessContext, Vector3, float)"/>
-        /// </summary>
-        public struct ProcessContext
+		/// <summary>
+		/// The context that holds all the data needed for particle distribution by any Particle Distributor.
+		/// </summary>
+		/// <remarks>
+		/// This is used for customizing and pre processing particle properties for custom distributions.
+		/// Used in <see cref="ParticleDistributor.Process(ProcessContext)"/> and <see cref="ParticleDistributor.ProcessProperties(ProcessContext, Vector3, float)"/>
+		/// </remarks>
+		public struct ProcessContext
         {
             /// <summary>
             /// The Context's particle.
@@ -144,13 +148,15 @@ namespace Galaxia
             }
         }
 
-        /// <summary>
-        /// Used to inverse an Animation curve.
-        /// This swaps the time and value of all the keys in the animation curve.
-        /// </summary>
-        /// <param name="curve">The animation curve to invert.</param>
-        /// <returns>The inverted version of the given animation curve.</returns>
-        public static AnimationCurve Inverse(AnimationCurve curve)
+		/// <summary>
+		/// Used to inverse an Animation curve.
+		/// </summary>
+		/// <remarks>
+		/// This swaps the time and value of all the keys in the animation curve.
+		/// </remarks>
+		/// <param name="curve">The animation curve to invert.</param>
+		/// <returns>The inverted version of the given animation curve.</returns>
+		public static AnimationCurve Inverse(AnimationCurve curve)
         {
             AnimationCurve inverse = new AnimationCurve();
             //Debug.Log(curve.keys.Length);

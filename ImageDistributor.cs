@@ -42,7 +42,14 @@ namespace Galaxia
 		[SerializeField,HideInInspector]
 		private int m_distributonDownsample = 1;
 
-        public override void Process(ProcessContext context)
+
+		/// <summary>
+		/// Used by the Particle Generator to modify/distribute the particles to a desired shape.
+		/// This is where particles are processed one by one.
+		/// <see cref="Galaxia.ParticleDistributor.ProcessContext"/>
+		/// </summary>
+		/// <param name="context">The context holds information on the current particle and Galaxy Object.</param>
+		public override void Process(ProcessContext context)
         {
 	        if (DistributionMap == null) { Debug.LogWarning("No Distribution Map", this); return;}
 	        if (cy == null || cx == null) return;
@@ -216,9 +223,11 @@ namespace Galaxia
 
 		/// <summary>
 		/// The Distribution Downsample. This controls at what resolution is the Distribution Map sampled.
+		/// </summary>
+		/// <remarks>
 		/// Lower values mean higher resolution, but lower performance.
 		/// Higher values mean lower resolution, but higher performance.
-		/// </summary>
+		/// </remarks>
 		public int DistributonDownsample
 		{
 			get { return m_distributonDownsample; }

@@ -9,7 +9,7 @@ namespace Galaxia
 {
 	/// <summary>
 	/// The Density Wave Distribution Algorithm
-	/// http://simeon.co.vu/Documentation/Galaxia/custom_distributors.html
+	/// <see href="http://simeon.co.vu/Documentation/Galaxia/custom_distributors.html"/>
 	/// </summary>
 	public sealed class DensityWaveDistributor : ParticleDistributor
     {
@@ -37,7 +37,7 @@ namespace Galaxia
 		/// <summary>
 		/// The main function for star orbits in the galaxy.
 		/// It also calculates the color of each particle
-		/// http://simeon.co.vu/Documentation/Galaxia/custom_distributors.html
+		/// <see href="http://simeon.co.vu/Documentation/Galaxia/custom_distributors.html"/>
 		/// </summary>
 		/// <param name="_particle">The particle to use, to calculate it's position</param>
 		/// <param name="galaxy">The <see cref="Galaxia.GalaxyPrefab"/> that holds all the information on the galaxy generation</param>
@@ -85,13 +85,6 @@ namespace Galaxia
             ProcessProperties(context,_pos,ellipseRotation);
 
             context.particle.position = _pos;
-        }
-
-        public override void RecreateCurves()
-        {
-            base.RecreateCurves();
-            //GalaxyHeightIntegral = ParticleDistributor.Integral(GalaxyHeightDistribution, 64);
-            //GalaxyHeightIntegralInverse = Inverse(GalaxyHeightIntegral);
         }
 
         public override void UpdateMaterial(Material material)

@@ -4,6 +4,8 @@ namespace SharpNeatLib.Maths
 {
 	/// <summary>
 	/// A fast random number generator for .NET
+	/// </summary>
+	/// <remarks>
 	/// Colin Green, January 2005
 	/// 
 	/// September 4th 2005
@@ -35,8 +37,7 @@ namespace SharpNeatLib.Maths
 	///  A further performance improvement can be obtained by declaring local variables as static, thus avoiding 
 	///  re-allocation of variables on each call. However care should be taken if multiple instances of
 	///  FastRandom are in use or if being used in a multi-threaded environment.
-	/// 
-	/// </summary>
+	/// </remarks>
 	public sealed class FastRandom
 	{
 		// The +1 ensures NextDouble doesn't generate 1.0

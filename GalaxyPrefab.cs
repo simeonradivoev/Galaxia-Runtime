@@ -39,20 +39,22 @@ namespace Galaxia
         [SerializeField]
         [HideInInspector]
         internal Shader shaderBruteForceGLSL;
-        #endregion
+		#endregion
 
-        /// <summary>
-        /// Gets a <see cref="Galaxia.ParticlesPrefab"/>
-        /// </summary>
-        /// <example>
-        /// <code>
-        /// GalaxyPrefab galaxy;
-        /// galaxy[0].Size = 0.2;
-        /// </code>
-        /// </example>
-        /// <param name="index"></param>
-        /// <returns>A <see cref="Galaxia.ParticlesPrefab"/> at index</returns>
-        public ParticlesPrefab this[int index]
+		/// <summary>
+		/// Gets a <see cref="Galaxia.ParticlesPrefab"/>
+		/// </summary>
+		/// <remarks>
+		/// <example>
+		/// <code>
+		/// GalaxyPrefab galaxy;
+		/// galaxy[0].Size = 0.2;
+		/// </code>
+		/// </example>
+		/// </remarks>
+		/// <param name="index"></param>
+		/// <returns>A <see cref="Galaxia.ParticlesPrefab"/> at index</returns>
+		public ParticlesPrefab this[int index]
         {
             get { return m_particlePrefabs[index]; }
         }
@@ -183,11 +185,13 @@ namespace Galaxia
             #endif
             }
         }
-        /// <summary>
-        /// Clears all the Particle Prefabs
-        /// Note that this does not Destory the Prefabs
-        /// </summary>
-        public void Clear()
+		/// <summary>
+		/// Clears all the Particle Prefabs
+		/// </summary>
+		/// <remarks>
+		/// Note that this does not Destory the Prefabs.
+		/// </remarks>
+		public void Clear()
         {
             m_particlePrefabs.Clear();
         }
@@ -233,12 +237,14 @@ namespace Galaxia
         {
             return m_particlePrefabs.Remove(item);
         }
-        /// <summary>
-        /// Updates all <see cref="Galaxia.Galaxy"/> that use the Galaxy Prefab
-        /// If a Galaxy is set to a Manual update, it will not be Updated.
-        /// This calls the <see cref="Galaxia.Galaxy.UpdateParticles()"/> method
-        /// </summary>
-        public void UpdateAllGalaxies()
+		/// <summary>
+		/// Updates all <see cref="Galaxia.Galaxy"/> that use the Galaxy Prefab
+		/// </summary>
+		/// <remarks>
+		/// If a Galaxy is set to a Manual update, it will not be Updated.
+		/// This calls the <see cref="Galaxia.Galaxy.UpdateParticles()"/> method
+		/// </remarks>
+		public void UpdateAllGalaxies()
         {
             foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
             {
@@ -248,13 +254,14 @@ namespace Galaxia
                 }
             }
         }
-        /// <summary>
-        /// Updates all the <see cref="Galaxia.Particles"/> with a given <see cref="Galaxia.ParticlesPrefab"/>
-        /// in all the Galaxies using the Galaxy prefab
-        /// Note that this updated the existing particles and does not Destory them
-        /// </summary>
-        /// <param name="prefab"></param>
-        public void UpdateAllGalaxies(ParticlesPrefab prefab)
+		/// <summary>
+		/// Updates all the <see cref="Galaxia.Particles"/> with a given <see cref="Galaxia.ParticlesPrefab"/> in all the Galaxies using the Galaxy prefab
+		/// </summary>
+		/// <remarks>
+		/// Note that this updated the existing particles and does not Destory them
+		/// </remarks>
+		/// <param name="prefab"></param>
+		public void UpdateAllGalaxies(ParticlesPrefab prefab)
         {
             foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
             {
@@ -265,11 +272,13 @@ namespace Galaxia
             }
         }
 
-        /// <summary>
-        /// Recreates the <seecref="Galaxia.Particles"/> of all <see name="Galaxies" cref="Galaxia.Galaxy"/> with the Galaxy Prefab
-        /// Note that this fully Destroys previous <see cref="Galaxia.Particles"/> and Creates new ones.
-        /// </summary>
-        public void RecreateAllGalaxies()
+		/// <summary>
+		/// Recreates the <seecref="Galaxia.Particles"/> of all <see name="Galaxies" cref="Galaxia.Galaxy"/> with the Galaxy Prefab
+		/// </summary>
+		/// <remarks>
+		/// Note that this fully Destroys previous <see cref="Galaxia.Particles"/> and Creates new ones.
+		/// </remarks>
+		public void RecreateAllGalaxies()
         {
             foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
             {
@@ -280,11 +289,13 @@ namespace Galaxia
             }
         }
 
-        /// <summary>
-        /// Recreates the <see cref="Galaxia.Particles"/> with a given <see cref="Galaxia.ParticlesPrefab"/> of all <see name="Galaxies" cref="Galaxia.Galaxy"/> with the Galaxy Prefab
-        /// Note that this fully Destroys previous <see cref="Galaxia.Particles"/> and Creates new ones.
-        /// </summary>
-        public void RecreateAllGalaxies(ParticlesPrefab prefab)
+		/// <summary>
+		/// Recreates the <see cref="Galaxia.Particles"/> with a given <see cref="Galaxia.ParticlesPrefab"/> of all <see name="Galaxies" cref="Galaxia.Galaxy"/> with the Galaxy Prefab
+		/// </summary>
+		/// <remarks>
+		/// Note that this fully Destroys previous <see cref="Galaxia.Particles"/> and Creates new ones.
+		/// </remarks>
+		public void RecreateAllGalaxies(ParticlesPrefab prefab)
         {
             foreach (Galaxy galaxy in GameObject.FindObjectsOfType<Galaxy>())
             {
@@ -309,11 +320,13 @@ namespace Galaxia
             }
         }
 
-        /// <summary>
-        /// Height Offset of the galaxy particles
-        /// This includes the range from -Offset to +Offset from the position the Galaxy is in
-        /// </summary>
-        public float HeightOffset
+		/// <summary>
+		/// Height Offset of the galaxy particles
+		/// </summary>
+		/// <remarks>
+		/// This includes the range from -Offset to +Offset from the position the Galaxy is in
+		/// </remarks>
+		public float HeightOffset
         {
             get { return m_heightOffset; }
             set
@@ -322,11 +335,13 @@ namespace Galaxia
                 UpdateAllGalaxies();
             }
         }
-        /// <summary>
-        /// The Active Distributor
-        /// Here are the algoriths for Position, color, size and rotation distribution of the particles
-        /// </summary>
-        public ParticleDistributor Distributor
+		/// <summary>
+		/// The Active Distributor
+		/// </summary>
+		/// <remarks>
+		/// Here are the algoriths for Position, color, size and rotation distribution of the particles
+		/// </remarks>
+		public ParticleDistributor Distributor
         {
 	        get
 	        {

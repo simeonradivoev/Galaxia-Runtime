@@ -79,11 +79,13 @@ namespace Galaxia
 		    }
 	    }
 
-        /// <summary>
-        /// Generates <see cref="Galaxia.Particles"/> to all the <see cref="Galaxia.ParticlesPrefab"/> in the galaxy
-        /// This function only generates the particles, not the Meshes
-        /// </summary>
-        public void GenerateParticles()
+		/// <summary>
+		/// Generates <see cref="Galaxia.Particles"/> to all the <see cref="Galaxia.ParticlesPrefab"/> in the galaxy
+		/// </summary>
+		/// <remarks>
+		/// This function only generates the particles, not the Meshes
+		/// </remarks>
+		public void GenerateParticles()
         {
             DestroyParticles();
 
@@ -255,10 +257,12 @@ namespace Galaxia
 
 		/// <summary>
 		/// Called by unity when the object is drawn by any camera.
+		/// </summary>
+		/// <remarks>
 		/// This method is the main rendering method for the galaxy.
 		/// It will not be called if the component is disabled or the Pre render event is used.
-		/// </summary>
-	    private void OnRenderObject()
+		/// </remarks>
+		private void OnRenderObject()
 	    {
 		    foreach (var particle in particles)
 		    {
@@ -270,11 +274,26 @@ namespace Galaxia
 					particle.Render();
 				}
 		    }
-	    }
+		}
 
 		/// <summary>
 		/// Draws the Galaxy and all the <see cref="Galaxia.Particles"/> in the Galaxy Now
 		/// </summary>
+		/// <remarks>
+		/// <example>
+		/// <code>
+		/// private void OnRenderObject()
+		/// {
+		///    foreach (var particle in particles)
+		///    {
+		///		particle.Render();
+		///    }
+		///	}
+		///}
+		/// </code>
+		/// </example>
+		/// </remarks>
+		/// 
 		public void DrawNow()
         {
             if (GalaxyPrefab != null && GPU)

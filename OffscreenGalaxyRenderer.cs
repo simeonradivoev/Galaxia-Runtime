@@ -10,8 +10,12 @@ namespace Galaxia
 {
 	/// <summary>
 	/// Renders the Galaxy and all it's particles as an Image Effect. Allowing downsampling of particles for overdrawing and performance.
-	/// <remarks>Depth not yet implemented!</remarks>
 	/// </summary>
+	/// <remarks>
+	/// This Component must be attached to a Camera. It works much the same as an Image Effect.
+	/// Galaxy Rendering will be canceled on the Galaxy Component, no manual disabling of rendering is required.
+	/// Depth not yet implemented!
+	/// </remarks>
 	[RequireComponent(typeof(Camera))]
 	public sealed class OffscreenGalaxyRenderer : GalaxyRenderer
 	{
