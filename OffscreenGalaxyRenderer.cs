@@ -4,7 +4,6 @@
 // Written by Simeon Radivoev (simeonradivoev@gmail.com)
 // ----------------------------------------------------------------
 using UnityEngine;
-using UnityEngine.Rendering;
 
 namespace Galaxia
 {
@@ -21,7 +20,6 @@ namespace Galaxia
 	{
 		[SerializeField] private int globalDownsample = 1;
 		[SerializeField] private bool hdr = true;
-		private Camera outputCamera;
 		private Camera hiddenCamera;
 		private Shader compositeShader;
 		private Material compositeMaterial;
@@ -33,6 +31,7 @@ namespace Galaxia
 		protected override void OnEnable()
 		{
 			base.OnEnable();
+			Camera.onPostRender -= OnPostRenderCustom;
 			Camera.onPostRender += OnPostRenderCustom;
 		}
 
@@ -41,7 +40,6 @@ namespace Galaxia
 		/// </summary>
 		private void Start()
 		{
-			outputCamera = GetComponent<Camera>();
 			compositeShader = Shader.Find("Hidden/Off-Screen Particles Composite");
 			if (compositeShader == null)
 			{
@@ -54,36 +52,41 @@ namespace Galaxia
 
 		private void OnRenderImage(RenderTexture src, RenderTexture dest)
 		{
-			if (compositeMaterial != null && Galaxy != null && outputCamera != null && this.outputCamera != null && hiddenCamera != null)
+			var outputCamera = Camera.current;
+
+			if (outputCamera != null)
 			{
-				CopyCamera(outputCamera, hiddenCamera);
-                hiddenCamera.hdr = hdr;
-
-				RenderTexture particlesRenderTexture = RenderTexture.GetTemporary(outputCamera.pixelWidth / globalDownsample, outputCamera.pixelHeight / globalDownsample, 8);
-				ClearRenderTexture(particlesRenderTexture, Color.black);
-				Vector2 texelOffset = Vector2.Scale(src.GetTexelOffset(), new Vector2(src.width, src.height));
-				foreach (var particle in Galaxy.Particles)
+				if (compositeMaterial != null && Galaxy != null && Galaxy.isActiveAndEnabled && Galaxy.RenderGalaxy && hiddenCamera != null)
 				{
-					RenderTexture temp = RenderTexture.GetTemporary(particlesRenderTexture.width / particle.Prefab.Downsample, particlesRenderTexture.height / particle.Prefab.Downsample, 8);
-					ClearRenderTexture(temp, Color.black);
-                    temp.DiscardContents(true, true);
-					hiddenCamera.targetTexture = temp;
-					currentRenderingParticles = particle;
-					hiddenCamera.Render();
-					Graphics.BlitMultiTap(temp, particlesRenderTexture, compositeMaterial, texelOffset);
-					RenderTexture.ReleaseTemporary(temp);
-				}
+					CopyCamera(outputCamera, hiddenCamera);
+					hiddenCamera.hdr = hdr;
 
-				hiddenCamera.targetTexture = null;
-				Graphics.Blit(particlesRenderTexture, src, compositeMaterial);
-				RenderTexture.ReleaseTemporary(particlesRenderTexture);
+					RenderTexture particlesRenderTexture = RenderTexture.GetTemporary(outputCamera.pixelWidth / globalDownsample, outputCamera.pixelHeight / globalDownsample, 8);
+					ClearRenderTexture(particlesRenderTexture, Color.black);
+					foreach (var particle in Galaxy.Particles)
+					{
+						RenderTexture temp = RenderTexture.GetTemporary(particlesRenderTexture.width / particle.Prefab.Downsample, particlesRenderTexture.height / particle.Prefab.Downsample, 8);
+						ClearRenderTexture(temp, Color.black);
+						temp.DiscardContents(true, true);
+						hiddenCamera.targetTexture = temp;
+						currentRenderingParticles = particle;
+						hiddenCamera.Render();
+						Graphics.Blit(temp, particlesRenderTexture, compositeMaterial);
+						RenderTexture.ReleaseTemporary(temp);
+					}
+
+					hiddenCamera.targetTexture = null;
+					Graphics.Blit(particlesRenderTexture, src, compositeMaterial);
+					RenderTexture.ReleaseTemporary(particlesRenderTexture);
+				}
 			}
 
 			Graphics.Blit(src, dest);
-        }
+		}
 
 		private void InitHiddenCamera()
 		{
+			if (hiddenCamera != null) return;
 			GameObject hiddenCameraObj = new GameObject("Hidden Galaxy Camera", typeof(Camera));
 			hiddenCamera = hiddenCameraObj.GetComponent<Camera>();
 			hiddenCamera.enabled = false;
@@ -114,8 +117,18 @@ namespace Galaxia
 
 		private void OnPostRenderCustom(Camera camera)
 		{
-			if (compositeMaterial == null || hiddenCamera != camera) return;
-			currentRenderingParticles?.DrawNow();
+			if (compositeMaterial == null) return;
+			if (hiddenCamera == camera)
+			{
+				currentRenderingParticles?.DrawNow();
+			}
+			else if (camera.name == "SceneCamera")
+			{
+				foreach (var particle in Galaxy.Particles)
+				{
+					particle.DrawNow();
+				}
+			}
 		}
 
 		/// <summary>
@@ -124,7 +137,7 @@ namespace Galaxia
 		protected override void OnDisable()
 		{
 			base.OnDisable();
-			if(Camera.onPostRender != null) Camera.onPostRender -= OnPostRenderCustom;
+			Camera.onPostRender -= OnPostRenderCustom;
 		}
 
 		private void OnDestory()
@@ -149,14 +162,6 @@ namespace Galaxia
 		{
 			get { return globalDownsample; }
 			set { globalDownsample = value; }
-		}
-
-		/// <summary>
-		/// The Output Camera
-		/// </summary>
-		public Camera OutputCamera
-		{
-			get { return outputCamera; }
 		}
 	}
 }

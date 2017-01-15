@@ -9,6 +9,7 @@
 using System;
 using UnityEngine;
 using System.Linq;
+using JetBrains.Annotations;
 using UnityEngine.Rendering;
 
 namespace Galaxia
@@ -74,6 +75,14 @@ namespace Galaxia
             UpdateMeshes();
         }
 
+		[UsedImplicitly]
+		private void OnEnable()
+		{
+			//force shrunken update
+			if (!m_gpu)
+				UpdateShuriken();
+		}
+
         void LateUpdate()
         {
             if(m_needsUpdate || m_needsRebuild)
@@ -121,6 +130,14 @@ namespace Galaxia
 			DrawNow();
 		}
 
+		private void DestoryOldRenderers()
+		{
+			if(m_renderers == null) return;
+			foreach (var mRenderer in m_renderers)
+			{
+				DestroyImmediate(mRenderer);
+			}
+		}
 
         /// <summary>
         /// Rebuilds the renderers.
@@ -132,13 +149,17 @@ namespace Galaxia
             {
                 if (!Galaxy.GPU)
                 {
-                    m_renderers = new GameObject[1];
+					DestoryOldRenderers();
+					m_renderers = new GameObject[1];
                     GameObject g = new GameObject("Shuriken Renderer", typeof(ParticleSystem));
-                    g.transform.parent = transform;
+                    g.transform.SetParent(transform);
                     ParticleSystem system = g.GetComponent<ParticleSystem>();
-					system.maxParticles = m_prefab.Count;
-					system.playOnAwake = false;
-	                system.startSpeed = 0;
+	                var main = system.main;
+					main.maxParticles = m_prefab.Count;
+					main.playOnAwake = false;
+					main.startSpeed = 0;
+	                main.prewarm = false;
+	                main.loop = false;
 					//emission Module
 					ParticleSystem.EmissionModule emissionModule = system.emission;
 	                emissionModule.enabled = false;
@@ -149,7 +170,8 @@ namespace Galaxia
                     renderer.shadowCastingMode = ShadowCastingMode.On;
                     renderer.receiveShadows = false;
 	                m_suruken_material = renderer.material;
-                    system.SetParticles(ParticleList.Select(p => Particle.ConvertToParticleSystem(p,m_prefab.TextureSheetPow)).ToArray(), m_particleList.Length);
+	                var surukenParticles = ParticleList.Select(p => Particle.ConvertToParticleSystem(p, m_prefab.TextureSheetPow)).ToArray();
+					system.SetParticles(surukenParticles, surukenParticles.Length);
 					//multiplying it by 10 fixed the size differences between Unity's particle System and the Custom Mesh Particles
 					renderer.maxParticleSize = m_prefab.MaxScreenSize * 10;
 					//animation module
@@ -186,7 +208,7 @@ namespace Galaxia
 
 		private void UpdateHideFlags()
 		{
-			gameObject.hideFlags = Galaxy.SaveParticles ? HideFlags.None : HideFlags.HideAndDontSave;
+			gameObject.hideFlags = Galaxy.SaveParticles ? HideFlags.None : HideFlags.DontSave;
 #if HIDE_SUB_ASSETS
 			gameObject.hideFlags |= HideFlags.HideInHierarchy;
 #endif

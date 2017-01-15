@@ -43,8 +43,9 @@ namespace Galaxia
             ParticleSystem.Particle particle = new ParticleSystem.Particle();
             particle.startColor = p.color;
             particle.position = p.position;
-            particle.lifetime = p.sheetPosition;
-            particle.startLifetime = sheetSize* sheetSize;
+			//add 1 to life to make sure particles don't disappear
+            particle.remainingLifetime = p.sheetPosition + 1;
+            particle.startLifetime = sheetSize* sheetSize + 1;
             particle.startSize = p.size;
             particle.rotation = p.rotation * Mathf.Rad2Deg;
             return particle;

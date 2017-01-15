@@ -38,7 +38,7 @@ namespace Galaxia
 		#region Events
 		private RenderEventHandler m_preRenderHandler;
 		private RenderEventHandler m_postRenderHandler;
-	    private RenderEvent lastPreRenderEvent = new RenderEvent(false);
+	    private RenderEvent lastPreRenderEvent = new RenderEvent(false); 
 		#endregion
 		#region Constructors
 		void OnEnable()
@@ -107,7 +107,7 @@ namespace Galaxia
                 if (prefab != null)
                 {
                     GameObject obj = new GameObject(prefab.name, typeof(Particles));
-					obj.transform.parent = transform;
+					obj.transform.SetParent(transform);
                     Particles p = obj.GetComponent<Particles>();
 					p.Init();
                     p.Generate(prefab, GalaxyPrefab, GPU);
@@ -264,6 +264,7 @@ namespace Galaxia
 		/// </remarks>
 		private void OnRenderObject()
 	    {
+			if (!isActiveAndEnabled) return;
 		    foreach (var particle in particles)
 		    {
 				if(!particle) continue;
@@ -557,8 +558,15 @@ namespace Galaxia
         }
         #endregion
 
+		/// <summary>
+		/// Galaxy Render Event
+		/// </summary>
 		public class RenderEvent
 		{
+			/// <summary>
+			/// Mark the render event as Used. This will make the galaxy skip it's own rendering.
+			/// Good for handling galaxy rendering elsewhere
+			/// </summary>
 			public bool Used;
 
 			public RenderEvent(bool used)
