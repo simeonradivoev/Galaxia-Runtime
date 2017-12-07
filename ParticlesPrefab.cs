@@ -229,10 +229,9 @@ namespace Galaxia
             {
                 s = prefab.shaderBruteForceGLSL;
             }
-                
 
-            m_material = new Material(s);
-            m_material.hideFlags = HideFlags.DontSave;
+
+	        m_material = new Material(s) {hideFlags = HideFlags.DontSave};
         }
 
         public void UpdateMaterialAnimation(GalaxyPrefab prefab,float speed,bool Animate)

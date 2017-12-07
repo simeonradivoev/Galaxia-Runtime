@@ -262,6 +262,10 @@ namespace Galaxia
             else
             {
                 Debug.LogWarning("Prefab was deleted");
+	            if (Galaxy != null)
+	            {
+		            Destroy();
+	            }
             }
         }
 
@@ -644,6 +648,8 @@ namespace Galaxia
 
 			if (m_galaxyPrefab.Distributor != null && m_prefab != null)
 			{
+				bool processFlag = m_galaxyPrefab.Distributor.CanProcess(m_prefab);
+
 				if (m_particleList.Length != m_prefab.Count)
 				{
 					System.Array.Resize<Particle>(ref m_particleList, m_prefab.Count);
@@ -652,10 +658,12 @@ namespace Galaxia
 				Random.seed = (int)(m_prefab.Seed);
 				for (int i = 0; i < m_prefab.Count; i++)
 				{
-					m_particleList[i] = new Particle();
-					m_particleList[i].index = i;
-					m_particleList[i].sheetPosition = Random.Next(0, m_prefab.TextureSheetPow * m_prefab.TextureSheetPow);
-					m_galaxyPrefab.Distributor.Process(new ParticleDistributor.ProcessContext(m_particleList[i], m_galaxyPrefab, m_prefab, time, i));
+					m_particleList[i] = new Particle
+					{
+						index = i,
+						sheetPosition = Random.Next(0, m_prefab.TextureSheetPow * m_prefab.TextureSheetPow)
+					};
+					if(processFlag) m_galaxyPrefab.Distributor.Process(new ParticleDistributor.ProcessContext(m_particleList[i], m_galaxyPrefab, m_prefab, time, i));
 				}
 			}
 			else
@@ -681,7 +689,9 @@ namespace Galaxia
         /// </summary>
         public void Destroy()
         {
-            DestoryMeshes();
+	        var galaxy = Galaxy;
+			if(galaxy != null) galaxy.RemoveParticles(this);
+			DestoryMeshes();
             DestroyRenderers();
             m_particleList = null;
             m_prefab = null;

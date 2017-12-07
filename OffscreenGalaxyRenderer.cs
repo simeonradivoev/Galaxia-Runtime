@@ -59,7 +59,7 @@ namespace Galaxia
 				if (compositeMaterial != null && Galaxy != null && Galaxy.isActiveAndEnabled && Galaxy.RenderGalaxy && hiddenCamera != null)
 				{
 					CopyCamera(outputCamera, hiddenCamera);
-					hiddenCamera.hdr = hdr;
+					hiddenCamera.allowHDR = hdr;
 
 					RenderTexture particlesRenderTexture = RenderTexture.GetTemporary(outputCamera.pixelWidth / globalDownsample, outputCamera.pixelHeight / globalDownsample, 8);
 					ClearRenderTexture(particlesRenderTexture, Color.black);
@@ -94,7 +94,7 @@ namespace Galaxia
 			hiddenCamera.clearFlags = CameraClearFlags.SolidColor;
 			hiddenCamera.backgroundColor = Color.black;
 			hiddenCamera.depthTextureMode = DepthTextureMode.None;
-			hiddenCamera.hdr = hdr;
+			hiddenCamera.allowHDR = hdr;
 			hiddenCameraObj.hideFlags = HideFlags.HideAndDontSave;
 		}
 

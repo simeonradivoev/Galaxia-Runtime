@@ -133,10 +133,11 @@ namespace Galaxia
 
             if (particles != null)
             {
-                foreach (Particles t in particles)
-                {
-					t?.Destroy();
-                }
+				//the particles remove themselves from the galaxy
+	            for (int i = particles.Count - 1; i >= 0; i--)
+	            {
+		            particles[i]?.Destroy();
+				}
 
 	            particles.Clear();
 
@@ -158,12 +159,12 @@ namespace Galaxia
         {
             if (particles != null)
             {
-                for (int i = 0; i < particles.Count;i++ )
-                {
-	                if (!particles[i] || particles[i].Prefab != prefab) continue;
-	                particles[i].Destroy();
-	                particles.RemoveAt(i);
-                }
+	            //the particles remove themselves from the galaxy
+				for (int i = particles.Count-1; i >= 0; i--)
+	            {
+					if (!particles[i] || particles[i].Prefab != prefab) continue;
+		            particles[i].Destroy();
+				}
             }
             else
             {
@@ -171,10 +172,15 @@ namespace Galaxia
             }
         }
 
-        /// <summary>
-        /// Marks all the <see cref="Galaxia.Particles"/> for Update, next frame.
-        /// </summary>
-        public void UpdateParticles()
+	    internal void RemoveParticles(Particles item)
+	    {
+		    particles?.Remove(item);
+	    }
+
+		/// <summary>
+		/// Marks all the <see cref="Galaxia.Particles"/> for Update, next frame.
+		/// </summary>
+		public void UpdateParticles()
         {
 			GalaxyPrefab?.Distributor.RecreateCurves();
 
@@ -193,14 +199,18 @@ namespace Galaxia
 		public void UpdateParticlesImmediately()
         {
 			GalaxyPrefab?.Distributor.RecreateCurves();
-			foreach (Particles particle in particles)
-            {
-                if (GalaxyPrefab != null)
-                {
-                    particle?.UpdateParticles();
-                }
-            }
+			if(GalaxyPrefab == null) return;
+	        ForceUpdateParticleComponents();
         }
+
+	    private void ForceUpdateParticleComponents()
+	    {
+			//particles components may remove themselves if invalid, that's why we need backwards iteration 
+		    for (int i = particles.Count - 1; i >= 0; i--)
+		    {
+			    particles[i]?.UpdateParticles();
+		    }
+		}
 
 		/// <summary>
 		/// Marks a <see cref="Galaxia.Particles"/> with a given <see cref="Galaxia.ParticlesPrefab"/> for Update, next frame.
@@ -223,13 +233,14 @@ namespace Galaxia
 		/// <param name="prefab">The <see cref="Galaxia.ParticlesPrefab"/> to search for</param>
 		public void UpdateParticlesImmediately(ParticlesPrefab prefab)
         {
-            foreach (Particles particle in particles)
-            {
-                if (particle && m_galaxy != null && particle.Prefab == prefab)
-                {
-                    particle.UpdateParticles();
-                }
-            }
+	        //particles components may remove themselves if invalid, that's why we need backwards iteration 
+			for (int i = particles.Count - 1; i >= 0; i--)
+	        {
+		        if (particles[i] && m_galaxy != null && particles[i].Prefab == prefab)
+		        {
+			        particles[i].UpdateParticles();
+		        }
+	        }
         }
 
         #endregion
@@ -448,10 +459,7 @@ namespace Galaxia
 		    {
 			    if (m_saveMeshes == value) return;
 			    m_saveMeshes = value;
-			    foreach (var particle in particles)
-			    {
-				    particle?.ForceUpdateParticles();
-			    }
+			    ForceUpdateParticleComponents();
 		    }
 	    }
 
@@ -466,10 +474,7 @@ namespace Galaxia
 			{
 				if (m_saveParticles == value) return;
 				m_saveParticles = value;
-				foreach (var particle in particles)
-				{
-					particle?.ForceUpdateParticles();
-				}
+				ForceUpdateParticleComponents();
 			}
 		}
 
@@ -483,11 +488,8 @@ namespace Galaxia
 		    {
 			    if (m_render_galaxy == value) return;
 			    m_render_galaxy = value;
-			    foreach (var particle in particles)
-			    {
-				    particle?.UpdateRenderer();
-			    }
-		    }
+				ForceUpdateParticleComponents();
+			}
 	    }
 
 		/// <summary>

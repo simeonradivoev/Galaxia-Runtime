@@ -73,7 +73,8 @@ namespace Galaxia
             if (shaderBruteForceGLSL == null)
                 shaderBruteForceGLSL = Resources.Load<Shader>("Shaders/ParticleBillboardBruteForceGLSL");
 
-	        m_distributor.SetGalaxyPrefab(this);
+			if(m_distributor != null)
+				m_distributor.SetGalaxyPrefab(this);
         }
         /// <summary>
         /// Gets the Enumerator for all of the particle prefabs
@@ -133,9 +134,8 @@ namespace Galaxia
             #if HIDE_SUB_ASSETS
             item.hideFlags = HideFlags.HideInHierarchy;
             #endif
-            item.Material = new Material(shader);
-            item.Material.hideFlags = HideFlags.HideInHierarchy | HideFlags.NotEditable;
-            m_particlePrefabs.Add(item);
+	        item.Material = new Material(shader) {hideFlags = HideFlags.HideInHierarchy | HideFlags.NotEditable};
+	        m_particlePrefabs.Add(item);
             RecreateAllGalaxies();
         }
 

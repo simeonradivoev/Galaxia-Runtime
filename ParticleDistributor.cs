@@ -32,6 +32,12 @@ namespace Galaxia
         /// </summary>
         /// <param name="context">The context holds information on the current particle and Galaxy Object.</param>
         public abstract void Process(ProcessContext context);
+		/// <summary>
+		/// Use to check if The Given Particle Prefab can even be processed before calling the 'Process' method for each particle
+		/// </summary>
+		/// <param name="particles"></param>
+		/// <returns></returns>
+		public abstract bool CanProcess(ParticlesPrefab particles);
         /// <summary>
         /// Used to process any additional properties dependent on the position and angle of a particle
         /// </summary>

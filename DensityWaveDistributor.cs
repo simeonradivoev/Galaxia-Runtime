@@ -33,18 +33,22 @@ namespace Galaxia
         private AnimationCurve m_galaxyHeightMultiply = DefaultResources.HeightCurve;
 		#endregion
 
+		/// <summary>
+		/// <see cref="Galaxia.ParticleDistributor.CanProcess"/>
+		/// </summary>
+		/// <param name="particles"></param>
+		/// <returns></returns>
+		public override bool CanProcess(ParticlesPrefab particles)
+		{
+			return true;
+		}
 
 		/// <summary>
 		/// The main function for star orbits in the galaxy.
 		/// It also calculates the color of each particle
 		/// <see href="http://simeon.co.vu/Documentation/Galaxia/custom_distributors.html"/>
 		/// </summary>
-		/// <param name="_particle">The particle to use, to calculate it's position</param>
-		/// <param name="galaxy">The <see cref="Galaxia.GalaxyPrefab"/> that holds all the information on the galaxy generation</param>
-		/// <param name="particles">The ParticlePrefab that holds the information on the particle itself</param>
-		/// <param name="center">The local center of the galaxy. It is advised to use the transform of the galaxy to move it</param>
-		/// <param name="angleRotation">the global rotation for all the particles a.k.a. the time</param>
-		/// <param name="index">the index of the particle</param>
+		/// <param name="context">The particle context containing all particle data</param>
 		public override void Process(ProcessContext context)
         {
             float dis = context.particles.PositionDistribution.Evaluate(context.index / (float)context.particles.Count);

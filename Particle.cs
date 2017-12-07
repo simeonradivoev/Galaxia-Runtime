@@ -40,23 +40,27 @@ namespace Galaxia
         /// <returns></returns>
         public static ParticleSystem.Particle ConvertToParticleSystem(Particle p,int sheetSize)
         {
-            ParticleSystem.Particle particle = new ParticleSystem.Particle();
-            particle.startColor = p.color;
-            particle.position = p.position;
-			//add 1 to life to make sure particles don't disappear
-            particle.remainingLifetime = p.sheetPosition + 1;
-            particle.startLifetime = sheetSize* sheetSize + 1;
-            particle.startSize = p.size;
-            particle.rotation = p.rotation * Mathf.Rad2Deg;
-            return particle;
+	        ParticleSystem.Particle particle = new ParticleSystem.Particle
+	        {
+		        startColor = p.color,
+		        position = p.position,
+		        remainingLifetime = p.sheetPosition + 1,
+		        startLifetime = sheetSize * sheetSize + 1,
+		        startSize = p.size,
+		        rotation = p.rotation * Mathf.Rad2Deg
+	        };
+	        //add 1 to life to make sure particles don't disappear
+	        return particle;
         }
 
 		public static implicit operator Particle(ParticleSystem.Particle p)
         {
-            Particle particle = new Particle();
-            particle.color = p.startColor;
-            particle.position = p.position;
-            return particle;
+	        Particle particle = new Particle
+	        {
+		        color = p.startColor,
+		        position = p.position
+	        };
+	        return particle;
         }
         #endregion
         #region Getters and setters

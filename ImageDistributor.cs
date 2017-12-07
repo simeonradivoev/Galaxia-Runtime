@@ -42,8 +42,22 @@ namespace Galaxia
 		[SerializeField,HideInInspector]
 		private int m_distributonDownsample = 1;
 
+	    /// <summary>
+	    /// <see cref="Galaxia.ParticleDistributor.CanProcess"/>
+	    /// </summary>
+	    /// <param name="particles"></param>
+	    /// <returns></returns>
+		public override bool CanProcess(ParticlesPrefab particles)
+	    {
+		    if (DistributionMap == null)
+		    {
+			    Debug.LogWarning("No Distribution Map", this);
+				return false;
+		    }
+		    return true;
+	    }
 
-		/// <summary>
+	    /// <summary>
 		/// Used by the Particle Generator to modify/distribute the particles to a desired shape.
 		/// This is where particles are processed one by one.
 		/// <see cref="Galaxia.ParticleDistributor.ProcessContext"/>
@@ -51,7 +65,7 @@ namespace Galaxia
 		/// <param name="context">The context holds information on the current particle and Galaxy Object.</param>
 		public override void Process(ProcessContext context)
         {
-	        if (DistributionMap == null) { Debug.LogWarning("No Distribution Map", this); return;}
+	        if (DistributionMap == null) return;
 	        if (cy == null || cx == null) return;
 
             int x = Mathf.Clamp(Mathf.FloorToInt(cx.Evaluate(Random.Next())), 0, (cy.Length-1));
@@ -189,10 +203,10 @@ namespace Galaxia
 		{
 			if (DistributionMap != texture)
 			{
+				DistributionMap = texture;
 				RecreateCurves();
                 GalaxyPrefab.RecreateAllGalaxies();
 			}
-			DistributionMap = texture;
 		}
 
 		/// <summary>
@@ -203,9 +217,9 @@ namespace Galaxia
 		{
 			if (ColorMap != texture)
 			{
-                GalaxyPrefab.RecreateAllGalaxies();
+				ColorMap = texture;
+				GalaxyPrefab.RecreateAllGalaxies();
 			}
-			ColorMap = texture;
 		}
 
 		/// <summary>
@@ -216,9 +230,9 @@ namespace Galaxia
 		{
 			if (HeightMap != texture)
 			{
-                GalaxyPrefab.RecreateAllGalaxies();
+				HeightMap = texture;
+				GalaxyPrefab.RecreateAllGalaxies();
 			}
-			HeightMap = texture;
 		}
 
 		/// <summary>
@@ -239,5 +253,32 @@ namespace Galaxia
 				GalaxyPrefab.RecreateAllGalaxies();
 			}
 		}
+
+		/// <summary>
+		/// Get The currently used distribution map
+		/// </summary>
+		/// <returns></returns>
+	    public Texture2D GetDistributionMap()
+	    {
+		    return DistributionMap;
+	    }
+
+		/// <summary>
+		/// Get the currently used color map
+		/// </summary>
+		/// <returns></returns>
+	    public Texture2D GetColorMap()
+	    {
+		    return ColorMap;
+	    }
+
+		/// <summary>
+		/// Get the currently used height map
+		/// </summary>
+		/// <returns></returns>
+	    public Texture2D GetHeightMap()
+	    {
+		    return HeightMap;
+	    }
     }
 }

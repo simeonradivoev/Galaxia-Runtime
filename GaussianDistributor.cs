@@ -20,7 +20,17 @@ namespace Galaxia
         private double m_variation = 1;
 		#endregion
 
-		/// <summary>
+	    /// <summary>
+	    /// <see cref="Galaxia.ParticleDistributor.CanProcess"/>
+	    /// </summary>
+	    /// <param name="particles"></param>
+	    /// <returns></returns>
+		public override bool CanProcess(ParticlesPrefab particles)
+	    {
+		    return true;
+	    }
+
+	    /// <summary>
 		/// Used by the Particle Generator to modify/distribute the particles to a desired shape.
 		/// </summary>
 		/// <remarks>
