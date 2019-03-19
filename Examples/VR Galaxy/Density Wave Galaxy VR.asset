@@ -1,0 +1,1116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1928326561, guid: f1157d3bd73d6474481e79c09412dee1, type: 3}
+  m_Name: Density Wave Galaxy VR
+  m_EditorClassIdentifier: 
+  m_particlePrefabs:
+  - {fileID: 11496328}
+  - {fileID: 11460046}
+  - {fileID: 11430054}
+  - {fileID: 11475964}
+  - {fileID: 11415504}
+  m_distributor: {fileID: 11474828}
+  m_size: 100
+  m_heightOffset: 10
+  m_galaxySpeed:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0.004496403
+      value: 0.1028679
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+    - time: 0.03126431
+      value: 0.886272
+      inSlope: 1.851171
+      outSlope: 1.851171
+      tangentMode: 0
+    - time: 0.2146933
+      value: 0.9149699
+      inSlope: -0.1125879
+      outSlope: -0.1125879
+      tangentMode: 0
+    - time: 0.5727876
+      value: 0.9286684
+      inSlope: -0.1552161
+      outSlope: -0.1552161
+      tangentMode: 0
+    - time: 1.002698
+      value: 0.9114413
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  shader: {fileID: 4800000, guid: bc2f44db49128594e93d8c1e41327518, type: 3}
+  shaderBruteForce: {fileID: 4800000, guid: 4f901ff5e0da80842bcee1ce990120cd, type: 3}
+  shaderBruteForceGLSL: {fileID: 4800000, guid: c1263728c7dde9247a5852fead5704d3,
+    type: 3}
+--- !u!114 &11415504
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1460108591, guid: f1157d3bd73d6474481e79c09412dee1, type: 3}
+  m_Name: Dust
+  m_EditorClassIdentifier: 
+  m_active: 1
+  m_count: 70000
+  m_seed: 4
+  m_size: 8
+  m_maxScreenSize: 0.02
+  m_positionDistribution:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+    - time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  m_sizeDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_rotationDistributor:
+    m_type: 4
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_alphaDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0.0008992806
+        value: 1.000408
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.01340023
+        value: 0.9367739
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.02689196
+        value: 0.9076897
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.1230904
+        value: 0.851472
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.1477445
+        value: 0.8311051
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.9980599
+        value: 0.2003719
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0.1
+    m_multiplayer: 0.02
+    m_frequncy: 1
+    m_amplitude: 1
+  m_colorDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_color:
+    key0:
+      serializedVersion: 2
+      rgba: 4293717493
+    key1:
+      serializedVersion: 2
+      rgba: 4284197613
+    key2:
+      serializedVersion: 2
+      rgba: 15511444
+    key3:
+      serializedVersion: 2
+      rgba: 16691336
+    key4:
+      serializedVersion: 2
+      rgba: 0
+    key5:
+      serializedVersion: 2
+      rgba: 0
+    key6:
+      serializedVersion: 2
+      rgba: 0
+    key7:
+      serializedVersion: 2
+      rgba: 0
+    ctime0: 0
+    ctime1: 12976
+    ctime2: 39780
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+  m_blendModeSrc: 5
+  m_blendModeDis: 1
+  m_renderQueue: 0
+  m_texture: {fileID: 2800000, guid: 9f702f3a18b56894282475a352d7d193, type: 3}
+  m_textureSheetPower: 1
+  m_downsample: 4
+  m_colorOverlay: {r: 1, g: 1, b: 1, a: 1}
+  m_originalPreset: 3
+  m_material: {fileID: 0}
+  m_galaxyPrefab: {fileID: 11400000}
+--- !u!114 &11430054
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1460108591, guid: f1157d3bd73d6474481e79c09412dee1, type: 3}
+  m_Name: Arm Stars
+  m_EditorClassIdentifier: 
+  m_active: 1
+  m_count: 13000
+  m_seed: 2
+  m_size: 2
+  m_maxScreenSize: 0.02
+  m_positionDistribution:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 10
+    - time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 10
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  m_sizeDistributor:
+    m_type: 2
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.3104338
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.49493244
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.72873664
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0.15
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_rotationDistributor:
+    m_type: 4
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 1
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_alphaDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0.0008992806
+        value: 1.000408
+        inSlope: -5.090356
+        outSlope: -5.090356
+        tangentMode: 0
+      - time: 0.01340023
+        value: 0.9367739
+        inSlope: -2.968448
+        outSlope: -2.968448
+        tangentMode: 0
+      - time: 0.02689196
+        value: 0.9076897
+        inSlope: -0.4536995
+        outSlope: -0.4536995
+        tangentMode: 0
+      - time: 0.1230904
+        value: 0.851472
+        inSlope: -0.2048324
+        outSlope: -0.2048324
+        tangentMode: 0
+      - time: 0.1477445
+        value: 0.8311051
+        inSlope: -2.438177
+        outSlope: -2.438177
+        tangentMode: 0
+      - time: 1
+        value: 0.21149424
+        inSlope: -0.01887445
+        outSlope: -0.03320185
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_colorDistributor:
+    m_type: 2
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_color:
+    key0:
+      serializedVersion: 2
+      rgba: 4293717493
+    key1:
+      serializedVersion: 2
+      rgba: 4284197630
+    key2:
+      serializedVersion: 2
+      rgba: 15511444
+    key3:
+      serializedVersion: 2
+      rgba: 16691336
+    key4:
+      serializedVersion: 2
+      rgba: 0
+    key5:
+      serializedVersion: 2
+      rgba: 0
+    key6:
+      serializedVersion: 2
+      rgba: 0
+    key7:
+      serializedVersion: 2
+      rgba: 0
+    ctime0: 0
+    ctime1: 12988
+    ctime2: 39798
+    ctime3: 65535
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+  m_blendModeSrc: 5
+  m_blendModeDis: 1
+  m_renderQueue: 0
+  m_texture: {fileID: 2800000, guid: af45ee64fc6f88749aea5a665b7e1fe4, type: 3}
+  m_textureSheetPower: 2
+  m_downsample: 1
+  m_colorOverlay: {r: 1, g: 1, b: 1, a: 1}
+  m_originalPreset: 1
+  m_material: {fileID: 0}
+  m_galaxyPrefab: {fileID: 11400000}
+--- !u!114 &11460046
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1460108591, guid: f1157d3bd73d6474481e79c09412dee1, type: 3}
+  m_Name: Big Stars
+  m_EditorClassIdentifier: 
+  m_active: 1
+  m_count: 10000
+  m_seed: 2
+  m_size: 1.5
+  m_maxScreenSize: 0.02
+  m_positionDistribution:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+    - time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  m_sizeDistributor:
+    m_type: 3
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0.0008992806
+        value: 1.000408
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.01340023
+        value: 0.9367739
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.02689196
+        value: 0.9076897
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.1230904
+        value: 0.851472
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.1477445
+        value: 0.8311051
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.9980599
+        value: 0.2003719
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 1
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_rotationDistributor:
+    m_type: 4
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 1
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_alphaDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0.0008992806
+        value: 1.000408
+        inSlope: -5.090356
+        outSlope: -5.090356
+        tangentMode: 0
+      - time: 0.01340023
+        value: 0.9367739
+        inSlope: -2.968448
+        outSlope: -2.968448
+        tangentMode: 0
+      - time: 0.02689196
+        value: 0.9076897
+        inSlope: -0.4536995
+        outSlope: -0.4536995
+        tangentMode: 0
+      - time: 0.1230904
+        value: 0.851472
+        inSlope: -0.2048324
+        outSlope: -0.2048324
+        tangentMode: 0
+      - time: 0.1477445
+        value: 0.8311051
+        inSlope: -2.438177
+        outSlope: -2.438177
+        tangentMode: 0
+      - time: 0.9980599
+        value: 0.2003719
+        inSlope: -0.01887445
+        outSlope: -0.03320185
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_colorDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 1
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_color:
+    key0:
+      serializedVersion: 2
+      rgba: 4293717493
+    key1:
+      serializedVersion: 2
+      rgba: 4284197613
+    key2:
+      serializedVersion: 2
+      rgba: 15511444
+    key3:
+      serializedVersion: 2
+      rgba: 16691336
+    key4:
+      serializedVersion: 2
+      rgba: 0
+    key5:
+      serializedVersion: 2
+      rgba: 0
+    key6:
+      serializedVersion: 2
+      rgba: 0
+    key7:
+      serializedVersion: 2
+      rgba: 0
+    ctime0: 0
+    ctime1: 12976
+    ctime2: 39780
+    ctime3: 65535
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+  m_blendModeSrc: 5
+  m_blendModeDis: 1
+  m_renderQueue: 0
+  m_texture: {fileID: 2800000, guid: af45ee64fc6f88749aea5a665b7e1fe4, type: 3}
+  m_textureSheetPower: 2
+  m_downsample: 1
+  m_colorOverlay: {r: 1, g: 1, b: 1, a: 1}
+  m_originalPreset: 1
+  m_material: {fileID: 0}
+  m_galaxyPrefab: {fileID: 11400000}
+--- !u!114 &11474828
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -1105773526, guid: f1157d3bd73d6474481e79c09412dee1, type: 3}
+  m_Name: DensityWaveDistributor
+  m_EditorClassIdentifier: 
+  periapsisDistance: 0.08
+  apsisDistance: 0.01
+  CenterMass: 830000
+  StarMass: 80
+  FocalPoint: -1
+  angleOffset: 8
+  m_heightVariance: 0.2
+  m_galaxyHeightMultiply:
+    serializedVersion: 2
+    m_Curve:
+    - time: -0.00008086581
+      value: 0.9473922
+      inSlope: -0.9130224
+      outSlope: -0.9130224
+      tangentMode: 0
+    - time: 0.03777196
+      value: 0.7948538
+      inSlope: -6.380379
+      outSlope: -6.380379
+      tangentMode: 0
+    - time: 0.1750727
+      value: 0.446302
+      inSlope: -0.5989536
+      outSlope: -0.5989536
+      tangentMode: 0
+    - time: 0.9987727
+      value: 0.04905841
+      inSlope: -0.3058203
+      outSlope: -0.3058203
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+--- !u!114 &11475964
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1460108591, guid: f1157d3bd73d6474481e79c09412dee1, type: 3}
+  m_Name: Arms Dust
+  m_EditorClassIdentifier: 
+  m_active: 1
+  m_count: 80000
+  m_seed: 3
+  m_size: 10
+  m_maxScreenSize: 0.02
+  m_positionDistribution:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0.17701147
+      inSlope: 0
+      outSlope: 1
+      tangentMode: 0
+    - time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 0
+      tangentMode: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  m_sizeDistributor:
+    m_type: 2
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.45690885
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.4997237
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.55077636
+        value: 0.0022988503
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_rotationDistributor:
+    m_type: 2
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 2
+        outSlope: 2
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0.05
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_alphaDistributor:
+    m_type: 3
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: -1
+        outSlope: -1
+        tangentMode: 10
+      - time: 1
+        value: 0
+        inSlope: -1
+        outSlope: -1
+        tangentMode: 10
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0
+    m_multiplayer: 0.8
+    m_frequncy: 0.03
+    m_amplitude: 1
+  m_colorDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: -1
+        outSlope: -1
+        tangentMode: 10
+      - time: 1
+        value: 0
+        inSlope: -1
+        outSlope: -1
+        tangentMode: 10
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 1
+    m_multiplayer: 0.7
+    m_frequncy: 1
+    m_amplitude: 1
+  m_color:
+    key0:
+      serializedVersion: 2
+      rgba: 4278190123
+    key1:
+      serializedVersion: 2
+      rgba: 4287467007
+    key2:
+      serializedVersion: 2
+      rgba: 0
+    key3:
+      serializedVersion: 2
+      rgba: 0
+    key4:
+      serializedVersion: 2
+      rgba: 0
+    key5:
+      serializedVersion: 2
+      rgba: 0
+    key6:
+      serializedVersion: 2
+      rgba: 0
+    key7:
+      serializedVersion: 2
+      rgba: 0
+    ctime0: 0
+    ctime1: 65535
+    ctime2: 65178
+    ctime3: 65535
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_NumColorKeys: 2
+    m_NumAlphaKeys: 2
+  m_blendModeSrc: 5
+  m_blendModeDis: 1
+  m_renderQueue: 0
+  m_texture: {fileID: 2800000, guid: 9f702f3a18b56894282475a352d7d193, type: 3}
+  m_textureSheetPower: 1
+  m_downsample: 4
+  m_colorOverlay: {r: 1, g: 1, b: 1, a: 1}
+  m_originalPreset: 3
+  m_material: {fileID: 0}
+  m_galaxyPrefab: {fileID: 11400000}
+--- !u!114 &11496328
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 1460108591, guid: f1157d3bd73d6474481e79c09412dee1, type: 3}
+  m_Name: Small Stars
+  m_EditorClassIdentifier: 
+  m_active: 1
+  m_count: 100000
+  m_seed: 0
+  m_size: 0.8
+  m_maxScreenSize: 0.06
+  m_positionDistribution:
+    serializedVersion: 2
+    m_Curve:
+    - time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 10
+    - time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 10
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 0
+  m_sizeDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0.0008992806
+        value: 1.000408
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.01340023
+        value: 0.9367739
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.02689196
+        value: 0.9076897
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.1230904
+        value: 0.851472
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.1477445
+        value: 0.8311051
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.9980599
+        value: 0.2003719
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0.5
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_rotationDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 1
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_alphaDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0.0008992806
+        value: 1.000408
+        inSlope: -14.071228
+        outSlope: -14.071228
+        tangentMode: 0
+      - time: 0.01340023
+        value: 0.9367739
+        inSlope: 0.051437747
+        outSlope: 0.051437747
+        tangentMode: 0
+      - time: 0.02689196
+        value: 0.9076897
+        inSlope: -1.5182688
+        outSlope: -1.5182688
+        tangentMode: 0
+      - time: 0.1230904
+        value: 0.851472
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.1477445
+        value: 0.8311051
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 0.9980599
+        value: 0.2003719
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 0
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_colorDistributor:
+    m_type: 0
+    m_distributionCurve:
+      serializedVersion: 2
+      m_Curve:
+      - time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      - time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 0
+    m_variation: 1
+    m_multiplayer: 1
+    m_frequncy: 1
+    m_amplitude: 1
+  m_color:
+    key0:
+      serializedVersion: 2
+      rgba: 4293717493
+    key1:
+      serializedVersion: 2
+      rgba: 4284197630
+    key2:
+      serializedVersion: 2
+      rgba: 15511444
+    key3:
+      serializedVersion: 2
+      rgba: 16691336
+    key4:
+      serializedVersion: 2
+      rgba: 0
+    key5:
+      serializedVersion: 2
+      rgba: 0
+    key6:
+      serializedVersion: 2
+      rgba: 0
+    key7:
+      serializedVersion: 2
+      rgba: 0
+    ctime0: 0
+    ctime1: 12988
+    ctime2: 39798
+    ctime3: 65535
+    ctime4: 65535
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 0
+    atime1: 65535
+    atime2: 0
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_NumColorKeys: 4
+    m_NumAlphaKeys: 2
+  m_blendModeSrc: 5
+  m_blendModeDis: 1
+  m_renderQueue: 0
+  m_texture: {fileID: 2800000, guid: af45ee64fc6f88749aea5a665b7e1fe4, type: 3}
+  m_textureSheetPower: 2
+  m_downsample: 1
+  m_colorOverlay: {r: 1, g: 1, b: 1, a: 1}
+  m_originalPreset: 1
+  m_material: {fileID: 0}
+  m_galaxyPrefab: {fileID: 11400000}
