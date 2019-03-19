@@ -14,8 +14,12 @@ There should also be a windows demo in the releases section.
 The API documentation can be found [here](https://galaxia.simeonradivoev.com/api/html/e7999a8b-177c-82fe-da7e-09cadc6b0933.htm) 
 
 # Screenshots
-![](https://simeonradivoev.com/storage/app/uploads/public/584/c6b/458/584c6b45867f3757829528.png)
-![](https://simeonradivoev.com/storage/app/uploads/public/584/c6b/490/584c6b49039c1265761730.png)
+![](https://raw.githubusercontent.com/wiki/simeonradivoev/galaxia-runtime/Images/02.36.07.36.35.png)
+![](https://raw.githubusercontent.com/wiki/simeonradivoev/galaxia-runtime/Images/02.45.07.45.54.png)
+![](https://raw.githubusercontent.com/wiki/simeonradivoev/galaxia-runtime/Images/10.06.11.06.47.png)
+![](https://raw.githubusercontent.com/wiki/simeonradivoev/galaxia-runtime/Images/10.08.11.08.29.png)
+![](https://raw.githubusercontent.com/wiki/simeonradivoev/galaxia-runtime/Images/19.06.01.06.31.png)
+![](https://raw.githubusercontent.com/wiki/simeonradivoev/galaxia-runtime/Images/10.05.11.05.57.png)
 
 # Notes
 This was a paid asset on the asset store, but I depricated it and decided to release the source code for it.
