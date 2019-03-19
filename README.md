@@ -5,6 +5,14 @@ This is the runtime souce code for the galaxy generator. For the editor scripts 
 # Getting Started
 Check out the wiki on how to get started as well as information on the types of particle distributors or how to create your own [here](https://github.com/simeonradivoev/Galaxia-Runtime/wiki/Creating-a-simple-Galaxy)
 
+# Examples
+There are several example scenes included.
+* VR galaxy scene
+* Image based galaxy
+* A simple galaxy map
+* Galaxy dynamic animation
+* Simple galaxy
+
 # Demo
 A webGL demo of the different distributors can be found [here](https://galaxia.simeonradivoev.com/WebGl/).
 
@@ -23,3 +31,4 @@ The API documentation can be found [here](https://galaxia.simeonradivoev.com/api
 
 # Notes
 This was a paid asset on the asset store, but I depricated it and decided to release the source code for it.
+The latest tested version of Unity compatible with the generator was 2017.1.2f.
