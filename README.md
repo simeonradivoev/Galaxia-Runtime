@@ -3,7 +3,7 @@ Galaxy generator for Unity 3D, with Custom Particle Distributors, DirectX 11 Par
 This is the runtime souce code for the galaxy generator. For the editor scripts and editor check out [Galaxia Editor](https://github.com/simeonradivoev/Galaxia-Editor)
 
 # Getting Started
-Check out the wiki on how to get started as well as information on the types of particle distributors or how to create your own [here](https://github.com/simeonradivoev/Galaxia-Runtime/wiki/Creating-a-simple-Galaxy)
+Check out the wiki on how to get started as well as information on the types of particle distributors or how to create your own [here](https://github.com/simeonradivoev/Galaxia-Runtime/wiki/Getting-Started)
 
 # Examples
 There are several example scenes included.
